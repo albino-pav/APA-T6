@@ -1,3 +1,6 @@
+import re
+
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +45,50 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+def leeAlumnos(file):
+    """
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
+    """
+    regex = r"(?P<id>\d+)\s+(?P<fullname>(?P<name>[a-zA-Z]+)(?:\s+[a-zA-Z]+)+)\s+(?P<notas>(\d+\.?\d*\s*)+)"
+    regex_nota = "\d+\.?\d*"
+    alumnos = {}
+    notas = []
+    with open(file, "rt") as f:
+        for line in f:
+            match = re.match(regex, line)
+            if match is None:
+                raise ValueError(f"No s'ha trobat match a la línea: {line}")
+            
+            nombre_completo = match["fullname"]
+            nombre = match["name"]
+            id = int(match["id"])
+            notas_str = match["notas"]
+            notas = [float(nota) for nota in re.findall(regex_nota, notas_str)]                
+            alumno = Alumno(nombre_completo)
+            alumno.notas = notas
+            alumno.numIden = id
+            alumnos[nombre] = alumno 
+        return alumnos
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
+
+
+
+                      
+                      
+
+
+
+
+        
