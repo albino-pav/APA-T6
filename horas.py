@@ -1,3 +1,12 @@
+"""
+Gerard Cots i Escudé i Joel Joan Morera Bokobo
+
+Este archivo define la función normalizaHoras que lee un fichero de entrada y 
+escrive en un fichero de salida las horas normalizadas y deja igual las formas incorrectas
+"""
+
+
+
 import re
 
 rehoras = r"(?P<hh>\d\d?)(?P<h>[hH:]?)(?P<mm>\d(?P<min_digit>\d?))?[mM]?"

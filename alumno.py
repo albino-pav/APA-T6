@@ -1,3 +1,15 @@
+"""
+Gerard Cots i Escudé i Joel Joan Morera Bokobo 
+
+En este archivo se define:
+
+class Alumno: Clase usada para el tratamiento de las notas de los alumnos.
+leeAlumnos(file): Lee el fichero de entrada y retorna un diccionario con el nombre de cada alumno como índice y los objetos 
+Alumno() como información.
+
+"""
+
+
 import re
 
 
@@ -48,6 +60,9 @@ class Alumno:
 
 def leeAlumnos(file):
     """
+    Lee el fichero de entrada y retorna un diccionario con el nombre de cada alumno como índice y los objetos 
+    Alumno() como información.
+
     >>> alumnos = leeAlumnos('alumnos.txt')
     >>> for alumno in alumnos:
     ...     print(alumnos[alumno])
