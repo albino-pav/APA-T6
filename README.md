@@ -1,6 +1,7 @@
 # EXpresiones Regulares
 
-## Nom i cognoms
+## Nom i cognoms: Gerard Cots i Escudé i Joel Joan Morera Bokobo
+
 
 ## Tratamiento de ficheros de notas
 
@@ -240,6 +241,8 @@ funcionamiento de su función.
 Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
 fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
+###### Tests unitarios leeAlumnos
+![tests_unitarios](tests.png)
 
 ##### Código desarrollado
 
@@ -247,6 +250,200 @@ Inserte a continuación los códigos fuente desarrollados en esta tarea, usando 
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
 
+##### alumno.py
+
+```python
+"""
+Gerard Cots i Escudé i Joel Joan Morera Bokobo 
+
+En este archivo se define:
+
+class Alumno: Clase usada para el tratamiento de las notas de los alumnos.
+leeAlumnos(file): Lee el fichero de entrada y retorna un diccionario con el nombre de cada alumno como índice y los objetos 
+Alumno() como información.
+
+"""
+import re
+
+class Alumno:
+    """
+    Clase usada para el tratamiento de las notas de los alumnos. Cada uno
+    incluye los atributos siguientes:
+
+    numIden:   Número de identificación. Es un número entero que, en caso
+               de no indicarse, toma el valor por defecto 'numIden=-1'.
+    nombre:    Nombre completo del alumno.
+    notas:     Lista de números reales con las distintas notas de cada alumno.
+    """
+
+    def __init__(self, nombre, numIden=-1, notas=[]):
+        self.numIden = numIden
+        self.nombre = nombre
+        self.notas = [nota for nota in notas]
+
+    def __add__(self, other):
+        """
+        Devuelve un nuevo objeto 'Alumno' con una lista de notas ampliada con
+        el valor pasado como argumento. De este modo, añadir una nota a un
+        Alumno se realiza con la orden 'alumno += nota'.
+        """
+        return Alumno(self.nombre, self.numIden, self.notas + [other])
+
+    def media(self):
+        """
+        Devuelve la nota media del alumno.
+        """
+        return sum(self.notas) / len(self.notas) if self.notas else 0
+
+    def __repr__(self):
+        """
+        Devuelve la representación 'oficial' del alumno. A partir de copia
+        y pega de la cadena obtenida es posible crear un nuevo Alumno idéntico.
+        """
+        return f'Alumno("{self.nombre}", {self.numIden!r}, {self.notas!r})'
+
+    def __str__(self):
+        """
+        Devuelve la representación 'bonita' del alumno. Visualiza en tres
+        columnas separas por tabulador el número de identificación, el nombre
+        completo y la nota media del alumno con un decimal.
+        """
+        return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+def leeAlumnos(file):
+    """
+    Lee el fichero de entrada y retorna un diccionario con el nombre de cada alumno como índice y los objetos 
+    Alumno() como información.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
+    """
+    regex = r"(?P<id>\d+)\s+(?P<fullname>(?P<name>[a-zA-Z]+)(?:\s+[a-zA-Z]+)+)\s+(?P<notas>(\d+\.?\d*\s*)+)"
+    regex_nota = "\d+\.?\d*"
+    alumnos = {}
+    with open(file, "rt") as f:
+        for line in f:
+            match = re.match(regex, line)
+            if match is None:
+                raise ValueError(f"No s'ha trobat match a la línea: {line}")
+            
+            notas_str = match["notas"]
+            notas = [float(nota) for nota in re.findall(regex_nota, notas_str)]                
+            alumno = Alumno(match["fullname"])
+            alumno.notas = notas
+            alumno.numIden = int(match["id"])
+            alumnos[match["name"]] = alumno 
+        return alumnos
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)              
+```
+
+##### horas.py
+```python
+"""
+Gerard Cots i Escudé i Joel Joan Morera Bokobo
+
+Este archivo define la función normalizaHoras que lee un fichero de entrada y 
+escrive en un fichero de salida las horas normalizadas y deja igual las formas incorrectas
+"""
+import re
+
+rehoras = r"(?P<hh>\d\d?)(?P<h>[hH:]?)(?P<mm>\d(?P<min_digit>\d?))?[mM]?"
+redia = r"de la (?P<mom>tarde|noche|mañana)"
+repartes = r"\w+\s+(?P<parte>punto|media)"
+recuartos = r"(?P<ym>y|menos)\s+(?P<cuarto>cuarto)"
+
+def normalizaHoras(fin, fout):
+    with open(fin, "rt") as fi, open(fout, "wt") as fo:
+        for linea in fi:
+            #if (match:=re.match(rehoras, linea)):
+                while (match:=re.search(rehoras, linea)):
+                    hora = int(match["hh"])
+                    minuto = int(match["mm"]) if match["mm"] else 0
+                    h = match["h"]
+                    min_digit = match["min_digit"]
+                    if minuto > 59 or hora > 23:
+                        fo.write(linea[:match.end()])
+                        linea = linea[match.end():]
+                    
+                    else:
+                        fo.write(linea[:match.start()])
+                        linea = linea[match.end():]
+
+                        if match:=re.search(redia, linea):
+                            if hora > 12:
+                                fo.write(f"{hora}")
+                                fo.write(linea[:match.end()])
+                                linea = linea[match.end():]
+                                continue
+                            elif match["mom"] == "mañana":
+                                if 6 <= hora <= 12:
+                                    pass
+                                else:
+                                    fo.write(f"{hora}")
+                                    fo.write(linea[:match.end()])
+                                    linea = linea[match.end():]
+                                    continue
+                            elif match["mom"] == "tarde":
+                                if hora == 12 or 1 <= hora <= 7:
+                                    hora += 12
+                                else:
+                                    fo.write(f"{hora}")
+                                    fo.write(linea[:match.end()])
+                                    linea = linea[match.end():]
+                                    continue
+                            elif match["mom"] == "noche":
+                                if 7 <= hora <= 12:
+                                    hora += 12
+                                    if hora == 24:
+                                        hora = 0
+                                else:
+                                    fo.write(f"{hora}")
+                                    fo.write(linea[:match.end()])
+                                    linea = linea[match.end():]
+                                    continue
+                            linea = linea[match.end():] 
+                            fo.write(f"{hora:02d}:{minuto:02d}")
+
+                        elif match:=re.search(repartes, linea):
+                            if hora > 12:
+                                fo.write(f"{hora}")
+                                fo.write(linea[:match.end()])
+                                linea = linea[match.end():]
+                                continue
+                            if match["parte"] == "media":
+                                minuto = 30
+                            linea = linea[match.end():]  
+                            fo.write(f"{hora:02d}:{minuto:02d}") 
+
+                        elif match:=re.search(recuartos, linea):
+                            if match["ym"] == "y":
+                                minuto = 15
+                            else:
+                                minuto = 45
+                                hora -= 1
+                            linea = linea[match.end():]
+                            fo.write(f"{hora:02d}:{minuto:02d}")
+
+                        elif h:
+                            if h == ":" and not min_digit:
+                                fo.write(f"{hora}{h}{minuto}")
+                            else:
+                                fo.write(f"{hora:02d}:{minuto:02d}")
+
+                        else:
+                            fo.write(f"{hora}")
+                                           
+                fo.write(linea)
+
+```
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
 La entrega se formalizará mediante *pull request* al repositorio de la tarea.
