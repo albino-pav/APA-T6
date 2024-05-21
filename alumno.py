@@ -59,24 +59,19 @@ def leeAlumnos(file):
     regex = r"(?P<id>\d+)\s+(?P<fullname>(?P<name>[a-zA-Z]+)(?:\s+[a-zA-Z]+)+)\s+(?P<notas>(\d+\.?\d*\s*)+)"
     regex_nota = "\d+\.?\d*"
     alumnos = {}
-    notas = []
     with open(file, "rt") as f:
         for line in f:
             match = re.match(regex, line)
             if match is None:
                 raise ValueError(f"No s'ha trobat match a la línea: {line}")
             
-            nombre_completo = match["fullname"]
-            nombre = match["name"]
-            id = int(match["id"])
             notas_str = match["notas"]
             notas = [float(nota) for nota in re.findall(regex_nota, notas_str)]                
-            alumno = Alumno(nombre_completo)
+            alumno = Alumno(match["fullname"])
             alumno.notas = notas
-            alumno.numIden = id
-            alumnos[nombre] = alumno 
+            alumno.numIden = int(match["id"])
+            alumnos[match["name"]] = alumno 
         return alumnos
-
 
 if __name__ == "__main__":
     import doctest
