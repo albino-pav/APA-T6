@@ -1,3 +1,5 @@
+import re
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +44,22 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+info_alumno = r"(?P<id>\d+)\s+(?P<nom>[a-zA-ZàÀèÈéÉòÒóÓíÍúÚçÇ\s]+)\s+(?P<notas>(\d+(?:[.,]\d+)?(?:\s+|$))*)"
+
+def leeAlumnos(ficAlum):
+    alumnos = {}
+    with open(ficAlum, "rt") as fpIn:
+        for linia in fpIn:
+            while (match := re.search(info_alumno, linia)):
+                lista_notas = list(map(float, match["notas"].split()))
+                alumno = Alumno(match["id"], match["nom"], match["notas"])
+                alumno.media()
+                alumnos[match['id']] = alumno
+            #     fpOut.write(linia[:match.start()])
+            #     hora = int(match["hh"])
+            #     minuto = int(match["mm"]) if match["mm"] else 0
+            #     fpOut.write(f"{hora:02d}:{minuto:02d}")
+            #     linia = linia[match.end():]
+            # fpOut.write(linia)
+
