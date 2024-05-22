@@ -20,8 +20,8 @@ class Alumno:
     """
 
     def __init__(self, nombre, numIden=-1, notas=[]):
-        self.numIden = numIden
         self.nombre = nombre
+        self.numIden = numIden
         self.notas = [nota for nota in notas]
 
     def __add__(self, other):
