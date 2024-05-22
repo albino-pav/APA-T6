@@ -9,6 +9,14 @@ class Alumno:
                de no indicarse, toma el valor por defecto 'numIden=-1'.
     nombre:    Nombre completo del alumno.
     notas:     Lista de números reales con las distintas notas de cada alumno.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
     """
 
     def __init__(self, nombre, numIden=-1, notas=[]):
@@ -51,15 +59,8 @@ def leeAlumnos(ficAlum):
     alumnos = {}
     with open(ficAlum, "rt") as fpIn:
         for linia in fpIn:
-            while (match := re.search(info_alumno, linia)):
+            if (match := re.search(info_alumno, linia)):
                 lista_notas = list(map(float, match["notas"].split()))
-                alumno = Alumno(match["id"], match["nom"], match["notas"])
-                alumno.media()
+                alumno = Alumno(match["nom"], match["id"], lista_notas)
                 alumnos[match['id']] = alumno
-            #     fpOut.write(linia[:match.start()])
-            #     hora = int(match["hh"])
-            #     minuto = int(match["mm"]) if match["mm"] else 0
-            #     fpOut.write(f"{hora:02d}:{minuto:02d}")
-            #     linia = linia[match.end():]
-            # fpOut.write(linia)
-
+    return alumnos
