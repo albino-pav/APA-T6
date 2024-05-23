@@ -10,7 +10,7 @@ class Alumno:
     nombre:    Nombre completo del alumno.
     notas:     Lista de números reales con las distintas notas de cada alumno.
 
-    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> alumnos = leeAlumnos('APA-T6\\alumnos.txt')
     >>> for alumno in alumnos:
     ...     print(alumnos[alumno])
     ...
@@ -64,3 +64,11 @@ def leeAlumnos(ficAlum):
                 alumno = Alumno(match["nom"], match["id"], lista_notas)
                 alumnos[match['id']] = alumno
     return alumnos
+
+if __name__ == "__main__":
+    import doctest 
+    doctest.testmod(verbose=True)
+
+alumnos = leeAlumnos('APA-T6\\alumnos.txt')
+for alumno in alumnos:
+    print(alumnos[alumno])
