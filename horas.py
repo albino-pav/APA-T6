@@ -12,7 +12,7 @@ import re
 rehoras = r"(?P<hh>\d\d?)(?P<h>[hH:]?)(?P<mm>\d(?P<min_digit>\d?))?[mM]?"
 redia = r"de la (?P<mom>tarde|noche|mañana)"
 repartes = r"\w+\s+(?P<parte>punto|media)"
-recuartos = r"(?P<ym>y|menos)\s+(?P<cuarto>cuarto)"
+recuartos = r"(?P<ym>y|menos)\s+(cuarto)"
 
 def normalizaHoras(fin, fout):
     with open(fin, "rt") as fi, open(fout, "wt") as fo:
@@ -30,6 +30,38 @@ def normalizaHoras(fin, fout):
                     else:
                         fo.write(linea[:match.start()])
                         linea = linea[match.end():]
+
+                        if match:=re.search(repartes, linea):
+                            if hora > 12:
+                                fo.write(f"{hora}")
+                                fo.write(linea[:match.end()])
+                                linea = linea[match.end():]
+                                continue
+                            if match["parte"] == "media":
+                                minuto = 30
+                                if match1:=re.search(redia,linea):
+                                    pass
+                                else:
+                                    linea = linea[match.end():] 
+                                    fo.write(f"{hora:02d}:{minuto:02d}")
+                                    continue                                
+                        
+                        if match:=re.search(recuartos, linea):
+                            if match1:=re.search(redia,linea):                            
+                                if match["ym"] == "y":
+                                    minuto = 15
+                                else:
+                                    minuto = 45
+                                    hora -= 1
+                            else:
+                                if match["ym"] == "y":
+                                    minuto = 15
+                                else:
+                                    minuto = 45
+                                    hora -= 1
+                                linea = linea[match.end():] 
+                                fo.write(f"{hora:02d}:{minuto:02d}")
+                                continue                          
 
                         if match:=re.search(redia, linea):
                             if hora > 12:
@@ -63,30 +95,12 @@ def normalizaHoras(fin, fout):
                                     fo.write(linea[:match.end()])
                                     linea = linea[match.end():]
                                     continue
+                            
                             linea = linea[match.end():] 
                             fo.write(f"{hora:02d}:{minuto:02d}")
+                            continue
 
-                        elif match:=re.search(repartes, linea):
-                            if hora > 12:
-                                fo.write(f"{hora}")
-                                fo.write(linea[:match.end()])
-                                linea = linea[match.end():]
-                                continue
-                            if match["parte"] == "media":
-                                minuto = 30
-                            linea = linea[match.end():]  
-                            fo.write(f"{hora:02d}:{minuto:02d}") 
-
-                        elif match:=re.search(recuartos, linea):
-                            if match["ym"] == "y":
-                                minuto = 15
-                            else:
-                                minuto = 45
-                                hora -= 1
-                            linea = linea[match.end():]
-                            fo.write(f"{hora:02d}:{minuto:02d}")
-
-                        elif h:
+                        if h:
                             if h == ":" and not min_digit:
                                 fo.write(f"{hora}{h}{minuto}")
                             else:
