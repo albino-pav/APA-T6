@@ -1,16 +1,10 @@
 # EXpresiones Regulares
 
-## Nom i cognoms
+#### Nom i cognoms: Ona Bonastre Martí
 
 ## Tratamiento de ficheros de notas
 
-Con el final de curso llega la ardua tarea de evaluar las tareas realizadas por los alumnos durante el
-mismo. Para facilitar esta tarea, se dispone de la clase `Alumno` que proporciona los datos
-fundamentales de cada alumno: su número de identificación (`numIden`), su nombre completo 
-(`nombre`) y la lista de notas obtenidas a lo largo del curso (`notas`). La clase también
-proporciona métodos para añadir una nota al expediente del alumno (`__add__()`), para obtener
-la representación *oficial* del mismo (`__repr__()`) y para obtener la representación
-*bonita* (`__str__()`).
+Con el final de curso llega la ardua tarea de evaluar las tareas realizadas por los alumnos durante el mismo. Para facilitar esta tarea, se dispone de la clase `Alumno` que proporciona los datos fundamentales de cada alumno: su número de identificación (`numIden`), su nombre completo (`nombre`) y la lista de notas obtenidas a lo largo del curso (`notas`). La clase también proporciona métodos para añadir una nota al expediente del alumno (`__add__()`), para obtener la representación *oficial* del mismo (`__repr__()`) y para obtener la representación *bonita* (`__str__()`).
 
 La definición de la clase `Alumno`, disponible en `alumno.py`, es:
 
@@ -61,8 +55,7 @@ class Alumno:
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
 ```
 
-A menudo, las notas de los alumnos se almacenan en ficheros de texto en los que los datos de cada alumno
-ocupan una línea con los distintos valores separados por espacios y/o tabuladores.
+A menudo, las notas de los alumnos se almacenan en ficheros de texto en los que los datos de cada alumno ocupan una línea con los distintos valores separados por espacios y/o tabuladores.
 
 El ejemplo siguiente muestra un fichero típico con las notas de tres alumnos:
 
@@ -72,18 +65,13 @@ El ejemplo siguiente muestra un fichero típico con las notas de tres alumnos:
 68  David Garcia Fuster 	7.75    5.25  8   
 ```
 
-Añada al fichero `alumno.py` la función `leeAlumnos(ficAlum)` que lea un fichero de texto con los datos de 
-todos los alumnos y devuelva un diccionario en el que la clave sea el nombre de cada alumno y su contenido 
-el objeto `Alumno` correspondiente.
+Añada al fichero `alumno.py` la función `leeAlumnos(ficAlum)` que lea un fichero de texto con los datos de todos los alumnos y devuelva un diccionario en el que la clave sea el nombre de cada alumno y su contenido el objeto `Alumno` correspondiente.
 
 La función deberá cumplir los requisitos siguientes:
 
-- Sólo debe realizar lo que se indica; es decir, debe leer el fichero de texto que se le pasa como único
-  argumento y devolver un diccionario con los datos de los alumnos.
+- Sólo debe realizar lo que se indica; es decir, debe leer el fichero de texto que se le pasa como único argumento y devolver un diccionario con los datos de los alumnos.
 - El análisis de cada línea de texto se realizará usando expresiones regulares.
-- La función `leeAlumnos()` debe incluir, en su cadena de documentación, la prueba unitaria siguiente según
-  el formato de la biblioteca `doctest`, donde el fichero `'alumnos.txt'` es el fichero mostrado como ejemplo
-  al principio de este enunciado:
+- La función `leeAlumnos()` debe incluir, en su cadena de documentación, la prueba unitaria siguiente según el formato de la biblioteca `doctest`, donde el fichero `'alumnos.txt'` es el fichero mostrado como ejemplo al principio de este enunciado:
 
   ```python
   >>> alumnos = leeAlumnos('alumnos.txt')
@@ -95,88 +83,56 @@ La función deberá cumplir los requisitos siguientes:
   68      David Garcia Fuster     7.0
   ```
 
-  - Evidentemente, es responsabilidad del autor comprobar que la prueba unitaria se pasa satisfactoriamente
-    antes de la entrega de la tarea.
+  - Evidentemente, es responsabilidad del autor comprobar que la prueba unitaria se pasa satisfactoriamente antes de la entrega de la tarea.
 
-  - Para evitar que diferencias debidas a espacios en blanco o tabuladores den lugar a error, se recomienda
-    efectuar las pruebas unitarias con la opción `doctest.NORMALIZE_WHITESPACE`. Por ejemplo,
-    `doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)`.
+  - Para evitar que diferencias debidas a espacios en blanco o tabuladores den lugar a error, se recomienda efectuar las pruebas unitarias con la opción `doctest.NORMALIZE_WHITESPACE`. Por ejemplo, `doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)`.
 
 
 ## Análisis de expresiones horarias
 
-En casi todos los idiomas más habituales, cualquier hora puede reducirse al formato estándar HH:MM, donde HH es 
-un número de dos dígitos, que representa la hora y está comprendido entre 00 y 23, y MM es otro número de dos 
-dígitos, que representa el minuto y está comprendido entre 00 y 59.
+En casi todos los idiomas más habituales, cualquier hora puede reducirse al formato estándar HH:MM, donde HH es un número de dos dígitos, que representa la hora y está comprendido entre 00 y 23, y MM es otro número de dos dígitos, que representa el minuto y está comprendido entre 00 y 59.
 
-No obstante, en el lenguaje hablado, es raro usar este formato estándar. En el caso del castellano, existe una
-gran variedad de formatos. La lista siguiente alguna de las posibilidades más frecuentes, aunque existen bastantes
-más:
+No obstante, en el lenguaje hablado, es raro usar este formato estándar. En el caso del castellano, existe una gran variedad de formatos. La lista siguiente alguna de las posibilidades más frecuentes, aunque existen bastantes más:
 
 - **08:27**
 
-  Es el formato estándar. Cuando la hora es menor que 10, es posible representarla con
-  dos dígitos (08:27), o sólo uno (8:27). Los minutos se representan siempre con dos (8:05).
+  Es el formato estándar. Cuando la hora es menor que 10, es posible representarla con dos dígitos (08:27), o sólo uno (8:27). Los minutos se representan siempre con dos (8:05).
 
 - **8h27m**
 
-  Las horas o minutos menores que 10 pueden representarse usando uno o dos dígitos. Las horas
-  *en punto* pueden indicarse sin minutos (8h).
+  Las horas o minutos menores que 10 pueden representarse usando uno o dos dígitos. Las horas *en punto* pueden indicarse sin minutos (8h).
 
 - **8 en punto**
 
-  Las horas exactas suelen indicarse con la partícula *'en punto'*. En ese caso, es
-  habitual omitir la letra *h* después de la cifra.
+  Las horas exactas suelen indicarse con la partícula *'en punto'*. En ese caso, es habitual omitir la letra *h* después de la cifra. Otras alternativas semejantes son las *'8 y cuarto'*, las *'8 y media'* o las *'8 menos cuarto'*.
 
-  Otras alternativas semejantes son las *'8 y cuarto'*, las *'8 y media'* o las *'8 menos cuarto'*.
-
-  En todos estos casos, el reloj empleado será de 12 horas y empezando en 1 (de 1 a 12). El
-  resultado será ambiguo, ya que no sabremos si una cierta hora es AM o PM, pero así es cómo
-  se suele hablar (la gente queda a *'las 11 en punto'* para ir a una fiesta, no a las
-  *'las 23 en punto'*). El resultado se devolverá siempre en el rango de 00:00 a 11:59.
+En todos estos casos, el reloj empleado será de 12 horas y empezando en 1 (de 1 a 12). El resultado será ambiguo, ya que no sabremos si una cierta hora es AM o PM, pero así es cómo  se suele hablar (la gente queda a *'las 11 en punto'* para ir a una fiesta, no a las  *'las 23 en punto'*). El resultado se devolverá siempre en el rango de 00:00 a 11:59.
 
 - **... de la mañana**
 
-  Las expresiones horarias entre las 4 y las 12 pueden ir seguidas de la partícula *'de la mañana'*.
-
-  Análogamente, las horas entre las 12 y las 3 pueden ir seguidas de *'del mediodía'*, las horas entre
-  las 3 y las 8 pueden serlo de *'de la tarde'*, entre 8 y 4 de *'de la noche'* y entre 1 y
+  Las expresiones horarias entre las 4 y las 12 pueden ir seguidas de la partícula *'de la mañana'*. Análogamente, las horas entre las 12 y las 3 pueden ir seguidas de *'del mediodía'*, las horas entre las 3 y las 8 pueden serlo de *'de la tarde'*, entre 8 y 4 de *'de la noche'* y entre 1 y
   6 de *'de la madrugada'*.
 
-  En estos casos, el reloj empleado es siempre de 12 horas (nunca se dice *'las 18 de la tarde'*, sino
-  *'las 6 de la tarde'*). Además la hora no puede ser cero, sino que, en ese caso, se usaría 12.
+En estos casos, el reloj empleado es siempre de 12 horas (nunca se dice *'las 18 de la tarde'*, sino *'las 6 de la tarde'*). Además la hora no puede ser cero, sino que, en ese caso, se usaría 12.
 
 ### Tarea: normalización de las expresiones horarias de un texto
 
-Escriba el fichero `horas.py` con la función `normalizaHoras(ficText, ficNorm)`, que lee el fichero de
-texto `ficText`, lo analiza en busca de expresiones horarias y escribe el fichero `ficNorm` en el que
-éstas se expresan según el formato normalizado, con las horas y los minutos indicados por dos dígitos
-y separados por dos puntos (08:27).
+Escriba el fichero `horas.py` con la función `normalizaHoras(ficText, ficNorm)`, que lee el fichero de texto `ficText`, lo analiza en busca de expresiones horarias y escribe el fichero `ficNorm` en el que éstas se expresan según el formato normalizado, con las horas y los minutos indicados por dos dígitos y separados por dos puntos (08:27).
 
-Cada línea del fichero puede contener, o no, una o más expresiones horarias, pero éstas nunca aparecerán
-partidas en más de una línea.
+Cada línea del fichero puede contener, o no, una o más expresiones horarias, pero éstas nunca aparecerán partidas en más de una línea.
 
-Las horas con expresión incorrecta, por ejemplo, *'17:5'* (en la expresión normalizada deben usarse dos
-dígitos para expresar los minutos) u *'11 de la tarde'* (la tarde nunca llega hasta esa hora), deben
-dejarse tal cual.
+Las horas con expresión incorrecta, por ejemplo, *'17:5'* (en la expresión normalizada deben usarse dos dígitos para expresar los minutos) u *'11 de la tarde'* (la tarde nunca llega hasta esa hora), deben dejarse tal cual.
 
-Para la evaluación de la tarea se usará un texto con unas cien expresiones horarias, que incluirán tanto
-expresiones correctas como incorrectas. Una parte de la nota dependerá de la precisión en su normalización.
+Para la evaluación de la tarea se usará un texto con unas cien expresiones horarias, que incluirán tanto expresiones correctas como incorrectas. Una parte de la nota dependerá de la precisión en su normalización.
 
-Se recomienda empezar normalizando textos que sólo contengan expresiones correctas del tipo más sencillo;
-es decir, con la forma *'18h45m'*. La consecución de este objetivo garantiza una nota mínima de notable
-bajo (7). La extensión al resto de formatos indicados y la detección de expresiones incorrectas serán
-necesarias para alcanzar la nota máxima (10).
+Se recomienda empezar normalizando textos que sólo contengan expresiones correctas del tipo más sencillo; es decir, con la forma *'18h45m'*. La consecución de este objetivo garantiza una nota mínima de notable bajo (7). La extensión al resto de formatos indicados y la detección de expresiones incorrectas serán necesarias para alcanzar la nota máxima (10).
 
-La tabla siguiente muestra un ejemplo de texto antes y después de su normalización, incluyendo tanto
-expresiones horarias **correctas** como <span style="color:red">**incorrectas**</span>.
+La tabla siguiente muestra un ejemplo de texto antes y después de su normalización, incluyendo tanto expresiones horarias **correctas** como <span style="color:red">**incorrectas**</span>.
 \end{exercicio}
 
 ### Ejemplo de normalización de las expresiones horarias de un texto
 
-Las líneas siguientes muestran ejemplos de expresiones horarias, tanto correctas como incorrectas. Las
-mismas expresiones se encuentran en el fichero `horas.txt`, que puede usar para comprobar el correcto
-funcionamiento de su función.
+Las líneas siguientes muestran ejemplos de expresiones horarias, tanto correctas como incorrectas. Las mismas expresiones se encuentran en el fichero `horas.txt`, que puede usar para comprobar el correcto funcionamiento de su función.
 
 #### Expresiones válidas
 
@@ -229,36 +185,167 @@ funcionamiento de su función.
 
 ##### Ficheros `alumno.py` y `horas.py`
 
-- Ambos ficheros deben incluir una cadena de documentación con el nombre del alumno o alumnos
-  y una descripción de su contenido.
+- Ambos ficheros deben incluir una cadena de documentación con el nombre del alumno o alumnos y una descripción de su contenido.
 
-- Se valorará lo pythónico de la solución; en concreto, su claridad y sencillez, y el
-  uso de los estándares marcados por PEP-ocho.
+- Se valorará lo pythónico de la solución; en concreto, su claridad y sencillez, y el uso de los estándares marcados por PEP-ocho.
 
 ##### Ejecución de los tests unitarios de `alumno.py`
 
-Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
-fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
-resultado de la ejecución de los tests unitarios.
+Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el resultado de la ejecución de los tests unitarios.
+
+<div style="text-align:center;">
+
+<div style="text-align:center;">
+<img src="ficheros/prueba_alumnos.png" alt="Test1" width="320" height="400">
+</div>
+
+</div>
 
 ##### Código desarrollado
 
-Inserte a continuación los códigos fuente desarrollados en esta tarea, usando los
-comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
-vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+Inserte a continuación los códigos fuente desarrollados en esta tarea, usando los comandos necesarios para que se realice el realce sintáctico en Python del mismo (no vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+###### Código de `alumnos.py`
+```py
+info_alumno = r"(?P<id>\d+)\s+(?P<nom>[a-zA-ZàÀèÈéÉòÒóÓíÍúÚçÇ\s]+)\s+(?P<notas>(\d+(?:[.,]\d+)?(?:\s+|$))*)"
+
+def leeAlumnos(ficAlum):
+    alumnos = {}
+    with open(ficAlum, "rt") as fpIn:
+        for linia in fpIn:
+            if (match := re.search(info_alumno, linia)):
+                lista_notas = list(map(float, match["notas"].split()))
+                alumno = Alumno(match["nom"], match["id"], lista_notas)
+                alumnos[match['id']] = alumno
+                # print(alumnos)
+    return alumnos
+
+if __name__ == "__main__":
+    import doctest 
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
+```
+###### Código de `horas.py`
+```py
+form_hm = r'(?P<h>\d\d?)[hH]((?P<m>\d\d?)[mM])?'
+form_hora = r'(?P<h>\d\d?) (?P<c>(en punto|y cuarto|y media|menos cuarto))'
+form_dia = r'(?P<h>\d\d?):?(?P<m>\d\d)?(( de)(l|( la) )(?P<d>(mañana|mediodía|tarde|noche|madrugada)))'
+
+def normaliza_form_hm(linia):
+    """
+    Normaliza las horas en formato "hh[hH]mm[mM]" a formato digital (hh:mm).
+    
+    Args:
+        linia (str): La línea de texto que contiene las horas a normalizar.
+    
+    Returns:
+        str: La línea de texto con las horas normalizadas en formato "hh:mm".
+    """
+    result = []
+    while (match := re.search(form_hm, linia)):
+        result.append(linia[:match.start()])
+        hora = int(match["h"])
+        minutos = int(match["m"]) if match["m"] else 0
+        if hora < 24 and minutos < 60:
+            result.append(f'{hora:02d}:{minutos:02d}')
+        else:
+            result.append(linia[match.start():match.end()])
+        linia = linia[match.end():]
+    result.append(linia)
+    return ''.join(result)
+
+def normaliza_form_hora(linia):
+    """
+    Normaliza las horas en formato de palabras (en punto, y media...) a formato digital (hh:mm).
+    
+    Args:
+        linia (str): La línea de texto que contiene las horas a normalizar.
+    
+    Returns:
+        str: La línea de texto con las horas normalizadas en formato "hh:mm".
+    """
+    result = []
+    while (match := re.search(form_hora, linia)):
+        result.append(linia[:match.start()])
+        hora = int(match["h"])
+        if match["c"] == "en punto":
+            hora = hora - 12 if hora > 12 else hora
+            result.append(f'{hora:02d}')
+        elif match["c"] == "y cuarto":
+            result.append(f'{hora:02d}:15')
+        elif match["c"] == "y media":
+            result.append(f'{hora:02d}:30')
+        elif match["c"] == "menos cuarto":
+            hora -= 1
+            result.append(f'{hora:02d}:45')
+        else:
+            result.append(linia[match.start():match.end()])
+        linia = linia[match.end():]
+    result.append(linia)
+    return ''.join(result)
+
+def normaliza_form_dia(linia):
+    """
+    Normaliza las horas en formato "hh:mm de [periodo del día]" a formato digital (hh:mm).
+    
+    Args:
+        linia (str): La línea de texto que contiene las horas a normalizar.
+    
+    Returns:
+        str: La línea de texto con las horas normalizadas en formato "hh:mm".
+    """
+    match = re.search(form_dia, linia)
+    if not match:
+        return linia
+    result = linia[:match.start()]
+    hora = int(match["h"])
+    minutos = int(match["m"]) if match["m"] else 0
+    periodo = match["d"]
+    
+    if minutos == 0:
+        if (periodo == "mediodía" and hora > 12 and hora < 16) or (periodo in ["tarde", "noche"] and hora >= 12):
+            hora -= 12
+    else:
+        if (periodo == "mediodía" and hora < 4) or (periodo in ["tarde", "noche"] and hora < 12):
+            hora += 12
+    if minutos != 0:
+        result += f'{hora:02d}:{minutos:02d}' 
+    elif minutos == 0 and hora == 0:
+        result += f'00:00'
+    else:
+        result += f'{hora}'
+
+    if hora < 13 and hora != 0:
+        result += linia[match.end("h"):]
+    else:
+        result += linia[match.end()]
+    return result
+
+
+def normalizaHoras(ficText, ficNorm):
+    """
+    Nombre: Ona Bonastre Martí
+    Clase utilizada para normalizar las expresiones horarias de un archivo de texto
+
+    Args:
+        ficText (str): ruta del archivo de entrada que contiene el texto a normalizar.
+        ficNorm (str): ruta del archivo de salida donde se escribirá el texto normalizado.
+    
+    """
+    with open(ficText) as fpIn, open(ficNorm, "wt") as fpOut:
+        for linia in fpIn:
+            linia_aux = normaliza_form_hm(linia)
+            linia_aux = normaliza_form_hora(linia_aux)
+            linia_aux = normaliza_form_dia(linia_aux)
+            fpOut.write(linia_aux)
+```
 
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
 La entrega se formalizará mediante *pull request* al repositorio de la tarea.
 
-El fichero `README.md` deberá respetar las reglas de los ficheros Markdown y
-visualizarse correctamente en el repositorio, incluyendo la imagen con la ejecución de
-los tests unitarios y el realce sintáctico del código fuente insertado.
+El fichero `README.md` deberá respetar las reglas de los ficheros Markdown y visualizarse correctamente en el repositorio, incluyendo la imagen con la ejecución de los tests unitarios y el realce sintáctico del código fuente insertado.
 
 ##### Y NADA MÁS
 
-Sólo se corregirá el contenido de este fichero `README.md` y los códigos fuente `alumno.py`
-y `horas.py`. No incluya otros ficheros con código fuente, notebooks de Jupyter o explicaciones
-adicionales; simplemente, no se tendrán en cuenta para la evaluación de la tarea. Evidentemente,
-sí puede añadir ficheros con las imágenes solicitadas en el enunciado, pero éstas deberán ser
-visualizadas correctamente desde este mismo fichero al acceder al repositorio de la tarea.
+Sólo se corregirá el contenido de este fichero `README.md` y los códigos fuente `alumno.py` y `horas.py`. No incluya otros ficheros con código fuente, notebooks de Jupyter o explicaciones adicionales; simplemente, no se tendrán en cuenta para la evaluación de la tarea. Evidentemente,
+sí puede añadir ficheros con las imágenes solicitadas en el enunciado, pero éstas deberán ser visualizadas correctamente desde este mismo fichero al acceder al repositorio de la tarea.
