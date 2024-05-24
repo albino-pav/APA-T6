@@ -195,7 +195,9 @@ Inserte a continuación una captura de pantalla que muestre el resultado de ejec
 
 <div style="text-align:center;">
 
-![Prueba unitaria](ficheros/prueba_alumnos.png)
+<div style="text-align:center;">
+<img src="ficheros/prueba_alumnos.png" alt="Test1" width="320" height="400">
+</div>
 
 </div>
 
