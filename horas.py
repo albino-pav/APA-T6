@@ -1,100 +1,117 @@
 import re
 
-rehm = r"(?P<hh>\d\d?)[hH]((?P<mm>\d\d?)[mM])?"
+form_hm = r'(?P<h>\d\d?)[hH]((?P<m>\d\d?)[mM])?'
+form_hora = r'(?P<h>\d\d?) (?P<c>(en punto|y cuarto|y media|menos cuarto))'
+form_dia = r'(?P<h>\d\d?):?(?P<m>\d\d)?(( de)(l|( la) )(?P<d>(mañana|mediodía|tarde|noche|madrugada)))'
 
-# def normalizaHoras(ficIn, ficOut):
-#     with open(ficIn, "rt") as fpIn, open(ficOut, "wt") as fpOut:
-#         for linia in fpIn:
-#             while (match := re.search(rehm, linia)):
-#                 fpOut.write(linia[:match.start()])
-#                 hora = int(match["hh"])
-#                 minuto = int(match["mm"]) if match["mm"] else 0
-#                 fpOut.write(f"{hora:02d}:{minuto:02d}")
-#                 linia = linia[match.end():]
-#             fpOut.write(linia)
+def normaliza_form_hm(linia):
+    """
+    Normaliza las horas en formato "hh[hH]mm[mM]" a formato digital (hh:mm).
+    
+    Args:
+        linia (str): La línea de texto que contiene las horas a normalizar.
+    
+    Returns:
+        str: La línea de texto con las horas normalizadas en formato "hh:mm".
+    """
+    result = []
+    while (match := re.search(form_hm, linia)):
+        result.append(linia[:match.start()])
+        hora = int(match["h"])
+        minutos = int(match["m"]) if match["m"] else 0
+        if hora < 24 and minutos < 60:
+            result.append(f'{hora:02d}:{minutos:02d}')
+        else:
+            result.append(linia[match.start():match.end()])
+        linia = linia[match.end():]
+    result.append(linia)
+    return ''.join(result)
 
-# format_hm = r"(?P<hh>\d\d?)[hH]((?P<mm>\d\d?)[mM])?"
-# format_dig = r"(?P<hh>\d\d?):(?P<mm>\d\d?)"
-# format_rodo = r"(?P<hh>\d\d?)h?" #(?P<reloj>[(en punto)(y cuarto)(y media)(menos cuarto)])?"
-# format_dia = r"(((?P<hh>\d\d?):(?P<mm>\d\d?))|((?P<hh>\d\d?)h?))"
-# format_dia = r"(((?P<hh>\d\d?):(?P<mm>\d\d?))|((?P<hh>\d\d?)h?))(?P<mig>\w*)(?P<momento>(madrugada)|(mañana)|(mediodía)|(tarde)|(noche))"
-#mañana, tarde, noche
-# en punto
+def normaliza_form_hora(linia):
+    """
+    Normaliza las horas en formato de palabras (en punto, y media...) a formato digital (hh:mm).
+    
+    Args:
+        linia (str): La línea de texto que contiene las horas a normalizar.
+    
+    Returns:
+        str: La línea de texto con las horas normalizadas en formato "hh:mm".
+    """
+    result = []
+    while (match := re.search(form_hora, linia)):
+        result.append(linia[:match.start()])
+        hora = int(match["h"])
+        if match["c"] == "en punto":
+            hora = hora - 12 if hora > 12 else hora
+            result.append(f'{hora:02d}')
+        elif match["c"] == "y cuarto":
+            result.append(f'{hora:02d}:15')
+        elif match["c"] == "y media":
+            result.append(f'{hora:02d}:30')
+        elif match["c"] == "menos cuarto":
+            hora -= 1
+            result.append(f'{hora:02d}:45')
+        else:
+            result.append(linia[match.start():match.end()])
+        linia = linia[match.end():]
+    result.append(linia)
+    return ''.join(result)
 
-# def normalizaHoras(ficIn, ficOut):
-#     with open(ficIn, "rt") as fpIn, open(ficOut, "wt") as fpOut:
-#         for linia in fpIn:
-#             while (match := re.search(format_hm, linia)):
-#                 fpOut.write(linia[:match.start()])
-#                 hora = int(match["hh"])
-#                 minuto = int(match["mm"]) if match["mm"] else 0
-#                 if hora < 24:
-#                     fpOut.write(f"{hora:02d}:{minuto:02d}")
-#                 else:
-#                     fpOut.write(f"{hora} horas y {minuto} minutos")
-#                 linia = linia[match.end():]
-#             while (match := re.search(format_dig, linia)):
-#                 fpOut.write(linia[:match.start()])
-#                 hora = int(match["hh"])
-#                 minuto = int(match["mm"])
-#                 fpOut.write(f"{hora:02d}:{minuto:02d}")
-#                 linia = linia[match.end():]
-#             while (match := re.search(format_rodo, linia)):
-#                 fpOut.write(linia[:match.start()])
-#                 hora = int(match["hh"])
-#                 if hora > 12 and hora < 24:
-#                     hora -= 12
-#                 else:
-#                     ValueError("Aquesta hora no existeix")
-#                 fpOut.write(f"{hora}")
-#                 linia = linia[match.end():]
-#             while (match := re.search(format_dia, linia)):
-#                 fpOut.write(linia[:match.start()])
-#                 hora = int(match["h"])
-#                 momento = match["momento"]
-#                 mig = match["mig"]
-#                 # if hora < 24 and hora > 13:
-#                 #     hora += 12
-#                 if hora > 6 and hora < 13 and momento != "mañana":
-#                     momento = "mañana"
-#                 elif hora > 12 and hora < 16 and momento != "mediodía":
-#                     momento = "mediodía"
-#                 elif hora > 15 and hora < 21 and momento != "tarde":
-#                     momento = "tarde"
-#                 elif hora > 20 and hora < 25 and hora < 4 and momento != "noche":
-#                     momento = "noche"
-#                 elif hora > 0 and hora < 7 and momento != "noche":
-#                     momento = "noche"
-#                 fpOut.write(f"{hora} {mig} {momento}")
+def normaliza_form_dia(linia):
+    """
+    Normaliza las horas en formato "hh:mm de [periodo del día]" a formato digital (hh:mm).
+    
+    Args:
+        linia (str): La línea de texto que contiene las horas a normalizar.
+    
+    Returns:
+        str: La línea de texto con las horas normalizadas en formato "hh:mm".
+    """
+    match = re.search(form_dia, linia)
+    if not match:
+        return linia
+    result = linia[:match.start()]
+    hora = int(match["h"])
+    minutos = int(match["m"]) if match["m"] else 0
+    periodo = match["d"]
+    
+    if minutos == 0:
+        if (periodo == "mediodía" and hora > 12 and hora < 16) or (periodo in ["tarde", "noche"] and hora >= 12):
+            hora -= 12
+    else:
+        if (periodo == "mediodía" and hora < 4) or (periodo in ["tarde", "noche"] and hora < 12):
+            hora += 12
+    if minutos != 0:
+        result += f'{hora:02d}:{minutos:02d}' 
+    elif minutos == 0 and hora == 0:
+        result += f'00:00'
+    else:
+        result += f'{hora}'
 
-#             fpOut.write(linia)
+    if hora < 13 and hora != 0:
+        result += linia[match.end("h"):]
+    else:
+        result += linia[match.end()]
+    return result
 
-
-form_hm = r'(?P<h>\d\d?)[hH]?((?P<m>\d\d?)[mM])?'
-# form_sol = r'(?P<h>\d\d?)[hH]?'
-form_dia = r'((de)(l|( la))(?P<d>(( mañana)|( mediodía)|( tarde)|( noche)|( madrugada))))'
-form_hora = r'(?P<h>\d\d? )(?P<c>(en punto)|(y cuarto)|(y media)|(menos cuarto))'
 
 def normalizaHoras(ficText, ficNorm):
+    """
+    Nombre: Ona Bonastre Martí
+    Clase utilizada para normalizar las expresiones horarias de un archivo de texto
+
+    Args:
+        ficText (str): ruta del archivo de entrada que contiene el texto a normalizar.
+        ficNorm (str): ruta del archivo de salida donde se escribirá el texto normalizado.
+    
+    """
     with open(ficText) as fpIn, open(ficNorm, "wt") as fpOut:
         for linia in fpIn:
-            while (cond1 := re.search(form_hm, linia)):
-                fpOut.write(linia[:cond1.start()])
-                hora = int(cond1["h"])
-                minutos = int(cond1["m"]) if cond1["m"] else 0
-                print(hora)
-                print(minutos)
-                if minutos == 0:
-                    if (cond2 := re.search(form_dia, linia)):
-                        if cond2[""]
-                if hora < 24 and minutos < 60:
-                    fpOut.write(f'{hora:02d}:{minutos:02d}')
-                linia = linia[cond1.end():]
-            fpOut.write(linia)
+            linia_aux = normaliza_form_hm(linia)
+            linia_aux = normaliza_form_hora(linia_aux)
+            linia_aux = normaliza_form_dia(linia_aux)
+            fpOut.write(linia_aux)
 
+salida = "APA-T6\\ficheros\salida.txt"
+a = normalizaHoras("APA-T6\\ficheros\horas.txt", salida)
 
-
-
-
-salida = "salida.txt"
-a = normalizaHoras("APA-T6\\horas.txt", salida)
