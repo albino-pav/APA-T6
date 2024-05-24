@@ -1,6 +1,6 @@
 # EXpresiones Regulares
 
-## Nom i cognoms
+## Nom i cognoms: Yago Carballo Barroso
 
 ## Tratamiento de ficheros de notas
 
