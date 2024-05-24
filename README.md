@@ -1,7 +1,7 @@
 # EXpresiones Regulares
 
 ## Nom i cognoms: Yago Carballo Barroso
-eeeee
+
 ## Tratamiento de ficheros de notas
 
 Con el final de curso llega la ardua tarea de evaluar las tareas realizadas por los alumnos durante el
