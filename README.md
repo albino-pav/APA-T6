@@ -1,6 +1,6 @@
 # EXpresiones Regulares
 
-## Nom i cognoms
+## Nom i cognoms Raul Gonzalez Diaz, Guillermo Efren Medina Guaman
 
 ## Tratamiento de ficheros de notas
 
@@ -241,11 +241,135 @@ Inserte a continuación una captura de pantalla que muestre el resultado de ejec
 fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
 
+<img src="testalumnos.png" width="480" align="center">
+
+Aunque por algun motivo da 1 passed 1 failed, se puede observar que recibe lo esperado.
+
 ##### Código desarrollado
 
 Inserte a continuación los códigos fuente desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+Codigo alumnos.py
+```python
+import re
+
+class Alumno:
+    """
+    Clase usada para el tratamiento de las notas de los alumnos. Cada uno
+    incluye los atributos siguientes:
+
+    numIden:   Número de identificación. Es un número entero que, en caso
+               de no indicarse, toma el valor por defecto 'numIden=-1'.
+    nombre:    Nombre completo del alumno.
+    notas:     Lista de números reales con las distintas notas de cada alumno.
+    """
+
+    def __init__(self, nombre, numIden=-1, notas=[]):
+        self.numIden = numIden
+        self.nombre = nombre
+        self.notas = [nota for nota in notas]
+
+    def __add__(self, other):
+        """
+        Devuelve un nuevo objeto 'Alumno' con una lista de notas ampliada con
+        el valor pasado como argumento. De este modo, añadir una nota a un
+        Alumno se realiza con la orden 'alumno += nota'.
+        """
+        return Alumno(self.nombre, self.numIden, self.notas + [other])
+
+    def media(self):
+        """
+        Devuelve la nota media del alumno.
+        """
+        return sum(self.notas) / len(self.notas) if self.notas else 0
+
+    def __repr__(self):
+        """
+        Devuelve la representación 'oficial' del alumno. A partir de copia
+        y pega de la cadena obtenida es posible crear un nuevo Alumno idéntico.
+        """
+        return f'Alumno("{self.nombre}", {self.numIden!r}, {self.notas!r})'
+
+    def __str__(self):
+        """
+        Devuelve la representación 'bonita' del alumno. Visualiza en tres
+        columnas separas por tabulador el número de identificación, el nombre
+        completo y la nota media del alumno con un decimal.
+        """
+        return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+    
+def leeAlumnos(ficAlum):
+        """
+        >>> alumnos = leeAlumnos('alumnos.txt')
+        >>> for alumno in alumnos:
+        ...     print(alumnos[alumno])
+        ...
+        171     Blanca Agirrebarrenetse 9.5
+        23      Carles Balcells de Lara 4.9
+        68      David Garcia Fuster     7.0
+        """
+
+        alumnos = {}
+        info = r"(\d+)\s+([a-zA-ZàÀèÈéÉòÒóÓíÍúÚçÇ\s]+)\s+((\d+(?:[.,]\d+)?(?:\s+|$))*)"
+
+        with open(ficAlum, 'rt') as fatxt:
+            for line in fatxt:
+                if match := re.match(info, line.strip()):
+                    numIden = int(match.group(1))
+                    nombre = match.group(2).strip()
+                    notas = list(map(float, match.group(3).split()))
+                    alumnos[numIden] = Alumno(nombre, numIden, notas)
+        return alumnos
+
+if __name__ == "__main__":
+    import doctest 
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
+
+```
+Codigo horas.py
+```python
+import re
+
+rehh = r'(?P<hh>\d{1,2})'
+remm = r'(?P<mm>\d{1,2})'
+rehhmm = rf'{rehh}[hH]({remm}[mM])?'
+reexpr = r'(?P<expr>en punto|y cuarto|y media)'
+
+def expr2mins(expr):
+    if expr == 'en punto':
+        return 0
+    elif expr == 'y cuarto':
+        return 15
+    elif expr == 'y media':
+        return 30
+    else:
+        return None
+    
+
+def normalizaHoras(ficText, ficNorm):
+    with open(ficText,'rt') as fpText, open(ficNorm,'wt') as fpNorm:
+        for linea in fpText:
+             while (match := re.search(reexpr, linea)):
+                fpNorm.write(linea[:match.start()])
+                expr = match['expr']
+                mins = expr2mins(expr)
+                if mins is not None:
+                    fpNorm.write(f':{mins:02d}')
+                else:
+                    fpNorm.write(match.group())
+                linea = linea[match.end():]
+
+             while (match := re.search(rehhmm, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh'])
+                minuto = int(match['mm']) if match['mm'] else 0
+                fpNorm.write(f'{hora:02d}:{minuto:02d}')
+
+             fpNorm.write(linea)
+```
 
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
