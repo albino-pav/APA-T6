@@ -243,6 +243,8 @@ resultado de la ejecución de los tests unitarios.
 
 <img src="testalumnos.png" width="480" align="center">
 
+Aunque por algun motivo da 1 passed 1 failed, se puede observar que recibe lo esperado.
+
 ##### Código desarrollado
 
 Inserte a continuación los códigos fuente desarrollados en esta tarea, usando los
