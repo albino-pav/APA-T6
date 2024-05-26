@@ -1,3 +1,10 @@
+"""
+Nombre: Yago Carballo Barroso
+Descripción: Este módulo contiene la función leeALumnos que lee un fichero con un formato ID:int NOMBRE:string NOTAS:list of floats y guarda la información en objetos de la clase Alumno.
+"""
+
+import re
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +49,27 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+re_expr = r'(?P<id>\d+)\s+(?P<nombre>(?:[a-zA-Z]?|\s)+)\s+(?P<notas>(?:(?:\d+(?:\.\d+)?)|\s+)+)'
+
+def leeAlumnos(ficAlum) -> dict:
+    """
+        >>> alumnos = leeAlumnos('alumnos.txt')
+        >>> for alumno in alumnos:
+        ...     print(alumnos[alumno])
+        ...
+        171 Blanca Agirrebarrenetse 9.5
+        23  Carles Balcells de Lara 4.9
+        68  David Garcia Fuster     7.0
+    """
+    alumnos = {}
+    with open(ficAlum) as f:
+        for linea in f:
+            regex = re.search(re_expr, linea)
+            notas = [float(i) for i in regex["notas"].split()]
+            alumnos[regex["nombre"]] = Alumno(regex["nombre"], regex["id"], notas)
+    return alumnos
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
