@@ -1,5 +1,6 @@
 """
 Nombre: Yago Carballo Barroso
+Descripción: Este módulo contiene la función leeALumnos que lee un fichero con un formato ID:int NOMBRE:string NOTAS:list of floats y guarda la información en objetos de la clase Alumno.
 """
 
 import re
@@ -71,5 +72,4 @@ def leeAlumnos(ficAlum) -> dict:
 
 if __name__ == "__main__":
     import doctest
-    doctest.testmod(verbose=True)
-    # Ambos unit test van correctamente pero no lo detecta correctamente (debe haber algún caracter invisible)
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)

@@ -1,5 +1,6 @@
 """
 Nombre: Yago Carballo Barroso
+Descripción: Este módulo contiene la función normalizaHoras que reescribe un fichero introducido para que todas las horas que se muestren estén en formato HH:MM
 """
 import re
 
@@ -25,9 +26,6 @@ def normalizaHoras(ficIn, ficOut):
                                 linea = linea[match1.end():]
                         else:
                             linea = linea[match1.end():]
-
-                    
-
 
                 if match2 := re.search(re_ex2, linea):
                     hora = int(match2["h"])
