@@ -1,6 +1,6 @@
 # EXpresiones Regulares
 
-## Nom i cognoms
+## Nom i cognoms VICTORIA BLANCO I MAIDER DURÓ
 
 ## Tratamiento de ficheros de notas
 
