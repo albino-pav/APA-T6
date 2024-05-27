@@ -281,6 +281,8 @@ if __name__ == "__main__":
 
   ```
 
+![Texto alternativo](imagen.jpg)
+
 **Horas.py**
 
 ```python
