@@ -1,3 +1,13 @@
+"""
+Sonia Sahuquillo Guillén
+Marcel Farelo de la Orden
+
+
+"""
+
+
+import re
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +52,42 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(file_path):
+    """
+    Lee el fichero de entrada y devuelve un diccionario con los nombres de los alumnos.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for nombre, alumno in alumnos.items():
+    ...     print(alumno)
+    ...
+    171     Blanca Agirrebarrenetse  9.5
+    23      Carles Balcells de Lara  4.9
+    68      David Garcia Fuster      7.0
+    """
+    pattern = re.compile(r'(\d+)\s+([a-zA-Z\s]+)\s+([\d\s\.]+)')
+    alumnos = {}
+
+    with open(file_path, 'r') as file:
+        for line in file:
+            match = pattern.match(line)
+            if not match:
+                raise ValueError(f"Línea no válida: {line.strip()}")
+
+            numIden = int(match.group(1))
+            nombre_completo = match.group(2).strip()
+            notas_str = match.group(3).strip()
+
+            notas = [float(nota) for nota in notas_str.split()]
+
+            nombre_clave = nombre_completo.split()[0]
+            alumno = Alumno(nombre_completo, numIden, notas)
+            alumnos[nombre_clave] = alumno
+
+    return alumnos
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
+
