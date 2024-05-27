@@ -1,44 +1,41 @@
-class Alumno:
+import re
+from alumno_class import Alumno
+
+def leeAlumnos(ficAlum):
     """
-    Clase usada para el tratamiento de las notas de los alumnos. Cada uno
-    incluye los atributos siguientes:
+    Lee un fichero de texto con los datos de todos los alumnos y devuelve un diccionario
+    donde la clave es el nombre de cada alumno y el valor es el objeto Alumno correspondiente,
+    con la media de las notas calculada.
 
-    numIden:   Número de identificación. Es un número entero que, en caso
-               de no indicarse, toma el valor por defecto 'numIden=-1'.
-    nombre:    Nombre completo del alumno.
-    notas:     Lista de números reales con las distintas notas de cada alumno.
+    :param ficAlum: Nombre del fichero de texto con los datos de los alumnos.
+    :return: Diccionario con los datos de los alumnos y su media de notas.
+    
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
     """
+    alumnos_dict = {}
+    with open(ficAlum, 'r') as file:
+        for line in file:
+            match = re.match(r'(\d+)\s+([^\d]+)\s+((?:\d*\.?\d+\s+)+)', line)
+            if match:
+                numIden = int(match.group(1))
+                nombre = match.group(2)
+                todas = [float(nota) for nota in match.group(3).split()]
 
-    def __init__(self, nombre, numIden=-1, notas=[]):
-        self.numIden = numIden
-        self.nombre = nombre
-        self.notas = [nota for nota in notas]
+                alumno = Alumno(nombre, numIden, todas)
+                alumnos_dict[nombre] = alumno
+                for alumno in alumnos_dict.values():
+                    Alumno.notas = alumno.media()
+    
 
-    def __add__(self, other):
-        """
-        Devuelve un nuevo objeto 'Alumno' con una lista de notas ampliada con
-        el valor pasado como argumento. De este modo, añadir una nota a un
-        Alumno se realiza con la orden 'alumno += nota'.
-        """
-        return Alumno(self.nombre, self.numIden, self.notas + [other])
+    return alumnos_dict
 
-    def media(self):
-        """
-        Devuelve la nota media del alumno.
-        """
-        return sum(self.notas) / len(self.notas) if self.notas else 0
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    def __repr__(self):
-        """
-        Devuelve la representación 'oficial' del alumno. A partir de copia
-        y pega de la cadena obtenida es posible crear un nuevo Alumno idéntico.
-        """
-        return f'Alumno("{self.nombre}", {self.numIden!r}, {self.notas!r})'
-
-    def __str__(self):
-        """
-        Devuelve la representación 'bonita' del alumno. Visualiza en tres
-        columnas separas por tabulador el número de identificación, el nombre
-        completo y la nota media del alumno con un decimal.
-        """
-        return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
