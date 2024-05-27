@@ -30,12 +30,10 @@ def leeAlumnos(ficAlum):
                 alumno = Alumno(nombre, numIden, todas)
                 alumnos_dict[nombre] = alumno
                 for alumno in alumnos_dict.values():
-                    Alumno.notas = alumno.media()
-    
+                    alumno.notas = [alumno.media()]
 
     return alumnos_dict
 
 if __name__ == "__main__":
     import doctest
-    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
