@@ -1,4 +1,4 @@
-# EXpresiones Regulares
+# Expresiones Regulares
 
 ## Nom i cognoms
 
