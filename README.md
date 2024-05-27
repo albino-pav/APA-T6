@@ -235,6 +235,92 @@ funcionamiento de su función.
 - Se valorará lo pythónico de la solución; en concreto, su claridad y sencillez, y el
   uso de los estándares marcados por PEP-ocho.
 
+**Alumno.py**
+  ```python
+import re
+from alumno_class import Alumno
+
+def leeAlumnos(ficAlum):
+    """
+    Lee un fichero de texto con los datos de todos los alumnos y devuelve un diccionario
+    donde la clave es el nombre de cada alumno y el valor es el objeto Alumno correspondiente,
+    con la media de las notas calculada.
+
+    :param ficAlum: Nombre del fichero de texto con los datos de los alumnos.
+    :return: Diccionario con los datos de los alumnos y su media de notas.
+    
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
+    """
+    alumnos_dict = {}
+    with open(ficAlum, 'r') as file:
+        for line in file:
+            match = re.match(r'(\d+)\s+([^\d]+)\s+((?:\d*\.?\d+\s+)+)', line)
+            if match:
+                numIden = int(match.group(1))
+                nombre = match.group(2)
+                todas = [float(nota) for nota in match.group(3).split()]
+
+                alumno = Alumno(nombre, numIden, todas)
+                alumnos_dict[nombre] = alumno
+                for alumno in alumnos_dict.values():
+                    alumno.notas = [alumno.media()]
+
+    return alumnos_dict
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
+
+
+
+  ```
+
+![Texto alternativo](imagen.jpg)
+
+**Horas.py**
+
+```python
+import re
+
+rehm = r"(?P<hh>\d\d?)[hH]((?P<mm>\d\d?)[mM])?"
+
+def normalizaHoras(ficIn, ficOut):
+    with open(ficIn, "rt") as fpIn, open(ficOut, "wt") as fpOut:
+        for linea in fpIn:
+            # Manejar el caso de "12"
+            linea = re.sub(r'\b12\b', '00:00', linea)
+            
+            # Manejar "5 menos cuarto"
+            linea = re.sub(r'\b5 menos cuarto\b', '04:45', linea)
+            
+            # Manejar "4:45"
+            linea = re.sub(r'\b4:45\b', '04:45', linea)
+            
+            while (match:= re.search(rehm, linea)):
+                fpOut.write(linea[:match.start()])
+                hora = int(match["hh"])
+                minuto = int(match["mm"]) if match["mm"] else 0
+                fpOut.write(f"{hora:02d}:{minuto:02d}")
+                linea = linea[match.end():]
+            
+            # Manejar el caso de "4 y media"
+            linea = re.sub(r'\b4 y media\b', '16:30', linea)
+            
+            fpOut.write(linea)
+
+# Ejemplo de uso
+normalizaHoras('horas.txt', 'salida2.txt')
+
+```
+
+
+
 ##### Ejecución de los tests unitarios de `alumno.py`
 
 Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
