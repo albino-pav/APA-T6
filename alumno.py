@@ -1,3 +1,5 @@
+import re
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -7,6 +9,14 @@ class Alumno:
                de no indicarse, toma el valor por defecto 'numIden=-1'.
     nombre:    Nombre completo del alumno.
     notas:     Lista de números reales con las distintas notas de cada alumno.
+    
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171 Blanca Agirrebarrenetse 9.5
+    23  Carles Balcells de Lara 4.9
+    68  David Garcia Fuster     7.0
     """
 
     def __init__(self, nombre, numIden=-1, notas=[]):
@@ -42,3 +52,21 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(ficAlum):
+    format = r"(?P<id>\d+)\s+(?P<nombre>[a-zA-ZàÀéÉèÈóÓòÒíÍúÚçÇñ\s]+)\s+(?P<notas>(\d+(?:[.,]\d+)?(?:\s+|$))*)"
+
+    alumnos = {}
+    with open(ficAlum, "rt") as f:
+        for linea in f:
+            if busqueda := re.search(format, linea):
+                notas = list(map(float, busqueda.group('notas').split()))
+                alumno = Alumno(busqueda.group('nombre'), int(busqueda.group('id')), notas)
+                alumnos[busqueda['id']] = alumno
+            
+    return alumnos 
+        
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
