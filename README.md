@@ -496,7 +496,9 @@ normalizaHoras("horas.txt","horas2.txt")
 
 ```
 
-
+![test unitarios](Fotoh1.png)
+![test unitarios](Fotoh2.png)
+![test unitarios](Fotoh3.png)
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
 La entrega se formalizará mediante *pull request* al repositorio de la tarea.
