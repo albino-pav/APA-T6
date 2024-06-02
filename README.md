@@ -1,6 +1,6 @@
 # EXpresiones Regulares
 
-## Nom i cognoms
+## Dídac Bassas, Vadym Lakimchuq
 
 ## Tratamiento de ficheros de notas
 
