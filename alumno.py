@@ -68,11 +68,11 @@ def leeAlumnos(ficAlum):
             match = re.match(info_alumno, linia)
             if match is None:
                 raise ValueError(f"Error: {line}")
+            else:
+                notas = list(map(float, match["notas"].split()))
+                alumno = Alumno(match["nom"],match["id"], notas)
             
-            notas = list(map(float, match["notas"].split()))
-            alumno = Alumno(match["nom"],match["id"], notas)
-            
-            alumnos[match['id']] = alumno
+                alumnos[match['id']] = alumno
     
     return alumnos
 
