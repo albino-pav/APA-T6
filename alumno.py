@@ -1,3 +1,8 @@
+#!/usr/bin/python3
+
+import re
+
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +47,36 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+info_alumno = r"(?P<id>\d+)\s+(?P<nom>(?P<name>[a-zA-Z]+)(?:\s+[a-zA-Z]+)+)\s+(?P<notas>(\d+\.?\d*\s*)+)"
+
+def leeAlumnos(ficAlum):
+    
+    """
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171 Blanca Agirrebarrenetse 9.5
+    23 Carles Balcell de Lara 4.9
+    68 David Garcia Fuster 7.0
+    """
+
+    alumnos = {}
+    with open(ficAlum, "rt") as fpIn:
+        for linia in fpIn:
+            match = re.match(info_alumno, linia)
+            if match is None:
+                raise ValueError(f"Error: {line}")
+            
+            notas = list(map(float, match["notas"].split()))
+            alumno = Alumno(match["nom"],match["id"], notas)
+            
+            alumnos[match['id']] = alumno
+    
+    return alumnos
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
