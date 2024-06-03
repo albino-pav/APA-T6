@@ -1,3 +1,4 @@
+import re
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +43,33 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+    def leeAlumnos(ficAlum):
+
+        """
+        Lee un fichero de texto con los datos de los alumnos y devuelve un
+        diccionario en el que la clave sea el nombre de cada alumno y su contenido
+        el objeto Alumno correspondiente.
+        """
+
+        alumnos_dict = {}
+        pattern = re.search(r'(\d+)\s+([A-Za-zÁÉÍÓÚáéíóúüñÑ ]+)\s+([\d\s.]+)') 
+
+        with open('alumnos.txt', 'r', encoding = 'utf-8') as file: 
+            """
+             Para cada línea, intenta hacer coincidirla con la expresión regular. 
+             Si coincide, extrae los datos, los convierte a los tipos apropiados y 
+             crea un objeto Alumno, que se agrega al diccionario.
+             """
+            for line in file:
+               match = pattern.match(line)
+               if match:
+                   numIden = int(match.group(1))
+                   nombre = match.group(2).strip()
+                   notas = list(map(float, match.group(3).split()))
+                   alumnos_dict[nombre] = Alumno(nombre, numIden, notas)
+       
+        return alumnos_dict
+
+    
+
