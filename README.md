@@ -1,6 +1,6 @@
 # EXpresiones Regulares
 
-## Nom i cognoms
+## Ivan Enciso y Pau Codina
 
 ## Tratamiento de ficheros de notas
 
