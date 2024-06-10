@@ -1,6 +1,6 @@
-# EXpresiones Regulares
+# Expresiones Regulares
 
-## Nom i cognoms
+## Albert Batlló
 
 ## Tratamiento de ficheros de notas
 
@@ -229,17 +229,171 @@ funcionamiento de su función.
 
 ##### Ficheros `alumno.py` y `horas.py`
 
-- Ambos ficheros deben incluir una cadena de documentación con el nombre del alumno o alumnos
-  y una descripción de su contenido.
+#### Alumno.py:
 
-- Se valorará lo pythónico de la solución; en concreto, su claridad y sencillez, y el
-  uso de los estándares marcados por PEP-ocho.
+```
+import re
+
+class Alumno:
+    """
+    Clase usada para el tratamiento de las notas de los alumnos. Cada uno
+    incluye los atributos siguientes:
+
+    numIden:   Número de identificación. Es un número entero que, en caso
+               de no indicarse, toma el valor por defecto 'numIden=-1'.
+    nombre:    Nombre completo del alumno.
+    notas:     Lista de números reales con las distintas notas de cada alumno.
+    """
+
+    def __init__(self, nombre, numIden=-1, notas=None):
+        if notas is None:
+            notas = []
+        self.numIden = numIden
+        self.nombre = nombre
+        self.notas = list(notas)
+
+    def __add__(self, other):
+        """
+        Devuelve un nuevo objeto 'Alumno' con una lista de notas ampliada con
+        el valor pasado como argumento. De este modo, añadir una nota a un
+        Alumno se realiza con la orden 'alumno += nota'.
+        """
+        return Alumno(self.nombre, self.numIden, self.notas + [other])
+
+    def media(self):
+        """
+        Devuelve la nota media del alumno.
+        """
+        return sum(self.notas) / len(self.notas) if self.notas else 0
+
+    def __repr__(self):
+        """
+        Devuelve la representación 'oficial' del alumno. A partir de copia
+        y pega de la cadena obtenida es posible crear un nuevo Alumno idéntico.
+        """
+        return f'Alumno("{self.nombre}", {self.numIden!r}, {self.notas!r})'
+
+    def __str__(self):
+        """
+        Devuelve la representación 'bonita' del alumno. Visualiza en tres
+        columnas separadas por tabulador el número de identificación, el nombre
+        completo y la nota media del alumno con un decimal.
+        """
+        return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+def leeAlumnos(ficAlum):
+    """
+    Lee un fichero de texto con los datos de los alumnos y devuelve un 
+    diccionario en el que la clave sea el nombre de cada alumno y su 
+    contenido el objeto Alumno correspondiente.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171 Blanca Agirrebarrenetse 9.5
+    23  Carles Balcells de Lara 4.9
+    68  David Garcia Fuster     7.0
+    """
+    alumnos = {}
+    with open(ficAlum, 'r') as file:
+        for line in file:
+            match = re.match(r'(\d+)\s+([A-Za-z\s]+)\s+([\d\s.]+)', line)
+            if match:
+                numIden = int(match.group(1))
+                nombre = match.group(2).strip()
+                notas_str = match.group(3).strip().split()
+                notas = list(map(float, notas_str))
+                alumnos[nombre] = Alumno(nombre, numIden, notas)
+    return alumnos
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
+```
+
+#### Horas.py:
+```
+import re
+
+rehh = r'(?P<hh>\d{1,2})'
+remm = r'(?P<mm>\d{1,2})'
+rehhmm = rf'{rehh}[hH]{remm}[mM]'
+rehh_colon_mm = r'(?P<hh>\d{1,2}):(?P<mm>\d{2})'
+rehh_en_punto = r'(?P<hh>\d{1,2}) en punto'
+rehh_cuarto = r'(?P<hh>\d{1,2}) y cuarto'
+rehh_media = r'(?P<hh>\d{1,2}) y media'
+rehh_menos_cuarto = r'(?P<hh>\d{1,2}) menos cuarto'
+rehh_periodo = r'(?P<hh>\d{1,2}) (de la mañana|del mediodía|de la tarde|de la noche|de la madrugada)'
+
+def normalizaHoras(ficText, ficNorm):
+    with open(ficText, 'rt') as fpText, open(ficNorm, 'wt') as fpNorm:
+        for linea in fpText:
+            while (match := re.search(rehh_colon_mm, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh'])
+                minuto = int(match['mm']) if match['mm'] else 0
+                fpNorm.write(f'{hora:02d}:{minuto:02d}')
+            
+            while (match := re.search(rehhmm, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh'])
+                minuto = int(match['mm']) if match['mm'] else 0
+                fpNorm.write(f'{hora:02d}:{minuto:02d}')
+            
+            while (match := re.search(rehh_en_punto, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh'])
+                fpNorm.write(f'{hora:02d}:00')
+            
+            while (match := re.search(rehh_cuarto, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh'])
+                fpNorm.write(f'{hora:02d}:15')
+            
+            while (match := re.search(rehh_media, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh'])
+                fpNorm.write(f'{hora:02d}:30')
+            
+            while (match := re.search(rehh_menos_cuarto, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh']) - 1
+                fpNorm.write(f'{hora:02d}:45')
+
+            while (match := re.search(rehh_periodo, linea)):
+                fpNorm.write(linea[:match.start()])
+                linea = linea[match.end():]
+                hora = int(match['hh'])
+                periodo = match.group(2)
+                if 'mañana' in periodo or 'madrugada' in periodo:
+                    if hora == 12:
+                        hora = 0
+                elif 'tarde' in periodo:
+                    if hora != 12:
+                        hora += 12
+                elif 'noche' in periodo:
+                    if hora != 12:
+                        hora += 12
+                fpNorm.write(f'{hora:02d}:00')
+                
+            fpNorm.write(linea)
+
+if __name__ == "__main__":
+    import doctest
+```
 
 ##### Ejecución de los tests unitarios de `alumno.py`
 
-Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
-fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
-resultado de la ejecución de los tests unitarios.
+![image](https://github.com/AlbertBatllo/APA-T6/assets/100155905/8ffac6ab-8ad5-4bb3-849c-839f4a11b100)
+
 
 ##### Código desarrollado
 
