@@ -18,7 +18,7 @@
 >
 > ¿Quiere saber más?, consulte con el profesorado.
  
-## Fecha de entrega: 24 de mayo a medianoche
+## Fecha de entrega: 7 de junio a medianoche
 
 ## Tratamiento de ficheros de notas
 
