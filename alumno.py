@@ -63,11 +63,14 @@ def leeAlumnos(ficAlum):
     el objeto Alumno correspondiente.
 
     >>> alumnos = leeAlumnos('alumnos.txt')
-    >>> for alumno in alumnos: # doctest: +NORMALIZE_WHITESPACE
-    ...     print(alumnos[alumno])
-    171     Blanca Agirrebarrenetse  9.5
-    23      Carles Balcells de Lara  4.9
-    68      David Garcia Fuster      7.0
+    >>> list(alumnos.keys())
+    ['Blanca Agirrebarrenetse', 'Carles Balcells de Lara', 'David Garcia Fuster']
+    >>> alumnos['Blanca Agirrebarrenetse'].numIden
+    171
+    >>> alumnos['Carles Balcells de Lara'].notas
+    [5.0, 5.0, 4.5, 5.2]
+    >>> alumnos['David Garcia Fuster'].media()
+    7.0
     """
     alumnos = {}
 
