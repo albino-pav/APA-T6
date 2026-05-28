@@ -64,10 +64,10 @@ def leeAlumnos(ficAlum):
 
     >>> alumnos = leeAlumnos('alumnos.txt')
     >>> list(alumnos.keys())
-    ['Blanca Agirrebarrenetse', 'Carles Balcells de Lara', 'David Garcia Fuster']
+    ['Blanca Agirrebarrenetse', 'Carles Balcell de Lara', 'David Garcia Fuster']
     >>> alumnos['Blanca Agirrebarrenetse'].numIden
     171
-    >>> alumnos['Carles Balcells de Lara'].notas
+    >>> alumnos['Carles Balcell de Lara'].notas
     [5.0, 5.0, 4.5, 5.2]
     >>> alumnos['David Garcia Fuster'].media()
     7.0
