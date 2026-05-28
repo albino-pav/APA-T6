@@ -63,7 +63,7 @@ def leeAlumnos(ficAlum):
     el objeto Alumno correspondiente.
 
     >>> alumnos = leeAlumnos('alumnos.txt')
-    >>> for alumno in alumnos:
+    >>> for alumno in alumnos: # doctest: +NORMALIZE_WHITESPACE
     ...     print(alumnos[alumno])
     171     Blanca Agirrebarrenetse  9.5
     23      Carles Balcells de Lara  4.9
