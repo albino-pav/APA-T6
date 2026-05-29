@@ -267,8 +267,9 @@ comandos necesarios para que se realice el realce sintáctico en Python del mism
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
 
 ´´´python 
-     import re
-    
+     
+      import re
+      
     class Alumno:
         """
         Clase usada para el tratamiento de las notas de los alumnos. Cada uno
