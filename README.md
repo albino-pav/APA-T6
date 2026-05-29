@@ -364,6 +364,7 @@ if __name__ == "__main__":
     # NORMALIZE_WHITESPACE evita fallos por diferencias entre pestañas y espacios
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
 ```
+###### Código de `horas.py`
 
 ```python
 """
