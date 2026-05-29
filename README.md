@@ -266,6 +266,10 @@ Inserte a continuación los códigos fuente desarrollados en esta tarea, usando 
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
 
+
+
+###### Código de `alumno.py`
+
 ```python
 import re
 
@@ -359,8 +363,6 @@ if __name__ == "__main__":
     import doctest
     # NORMALIZE_WHITESPACE evita fallos por diferencias entre pestañas y espacios
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
-     
-     
 ```
 
 ```python
@@ -516,6 +518,7 @@ def normalizaHoras(ficText, ficNorm):
             linea_mod = re.sub(pat_hm, repl_hm, linea_mod)
             linea_mod = re.sub(pat_palabras, repl_palabras, linea_mod)
             f_out.write(linea_mod)
+
 ```
 
 ##### Subida del resultado al repositorio GitHub y *pull-request*
