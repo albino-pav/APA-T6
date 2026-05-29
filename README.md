@@ -5,7 +5,7 @@
 > [!Important]
 > Introduzca a continuación su nombre y apellidos:
 >
-> Fulano Mengano Zutano
+> Steven Daniel Vizcaino Cedeño
 
 ## Aviso Importante
 
@@ -258,11 +258,269 @@ Inserte a continuación una captura de pantalla que muestre el resultado de ejec
 fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
 
+![Resultado de los tests unitarios - Parte 1](testalumnos.png)
+
 ##### Código desarrollado
 
 Inserte a continuación los códigos fuente desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+
+
+###### Código de `alumno.py`
+
+```python
+import re
+
+class Alumno:
+    """
+    Clase usada para el tratamiento de las notas de los alumnos. Cada uno
+    incluye los atributos siguientes:
+
+    numIden:   Número de identificación. Es un número entero que, en caso
+               de no indicarse, toma el valor por defecto 'numIden=-1'.
+    nombre:    Nombre completo del alumno.
+    notas:     Lista de números reales con las distintas notas de cada alumno.
+    """
+
+    def __init__(self, nombre, numIden=-1, notas=[]):
+        self.numIden = numIden
+        self.nombre = nombre
+        self.notas = [nota for nota in notas]
+
+    def __add__(self, other):
+        """
+        Devuelve un nuevo objeto 'Alumno' con una lista de notas ampliada con
+        el valor pasado como argumento. De este modo, añadir una nota a un
+        Alumno se realiza con la orden 'alumno += nota'.
+        """
+        return Alumno(self.nombre, self.numIden, self.notas + [other])
+
+    def media(self):
+        """
+        Devuelve la nota media del alumno.
+        """
+        return sum(self.notas) / len(self.notas) if self.notas else 0
+
+    def __repr__(self):
+        """
+        Devuelve la representación 'oficial' del alumno. A partir de copia
+        y pega de la cadena obtenida es posible crear un nuevo Alumno idéntico.
+        """
+        return f'Alumno("{self.nombre}", {self.numIden!r}, {self.notas!r})'
+
+    def __str__(self):
+        """
+        Devuelve la representación 'bonita' del alumno. Visualiza en tres
+        columnas separas por tabulador el número de identificación, el nombre
+        completo y la nota media del alumno con un decimal.
+        """
+        return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(ficAlum):
+    """
+    Lee un fichero de texto con los datos de todos los alumnos y devuelve 
+    un diccionario en el que la clave sea el nombre de cada alumno y su 
+    contenido el objeto Alumno correspondiente.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171\tBlanca Agirrebarrenetse\t9.5
+    23\tCarles Balcell de Lara\t4.9
+    68\tDavid Garcia Fuster\t7.0
+    """
+    diccionario_alumnos = {}
+    
+    # Expresión regular para capturar: ID, Nombre (mínimo emparejamiento) y bloque de notas
+    patron = r'^\s*(\d+)\s+(.+?)\s+((?:\d+(?:\.\d+)?\s*)+)\s*$'
+    
+    with open(ficAlum, 'r', encoding='utf-8') as f:
+        for linea in f:
+            linea = linea.strip()
+            if not linea:
+                continue
+                
+            match = re.match(patron, linea)
+            if match:
+                num_id = int(match.group(1))
+                nombre = match.group(2).strip()
+                bloque_notas = match.group(3)
+                
+                # Extraemos todas las notas individuales del bloque final
+                notas = [float(n) for n in re.findall(r'\d+(?:\.\d+)?', bloque_notas)]
+                
+                # Creamos el objeto Alumno y lo guardamos
+                diccionario_alumnos[nombre] = Alumno(nombre, num_id, notas)
+                
+    return diccionario_alumnos
+
+
+if __name__ == "__main__":
+    import doctest
+    # NORMALIZE_WHITESPACE evita fallos por diferencias entre pestañas y espacios
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
+```
+###### Código de `horas.py`
+
+```python
+"""
+Fichero: horas.py
+Descripción: Filtro de normalización de expresiones horarias en castellano
+             mediante expresiones regulares.
+"""
+
+import re
+
+def _obtener_desplazamiento_periodo(hh_orig, hh_adj, periodo):
+    """
+    Valida la hora según el periodo lingüístico y devuelve el valor en formato 24h.
+    Si la combinación es incorrecta, devuelve None.
+    """
+    if periodo == 'de la mañana':
+        if not (4 <= hh_orig <= 12): 
+            return None
+        return hh_adj
+        
+    elif periodo == 'del mediodía':
+        if hh_orig not in [12, 1, 2, 3]: 
+            return None
+        return hh_adj if hh_adj == 12 else hh_adj + 12
+        
+    elif periodo == 'de la tarde':
+        if not (3 <= hh_orig <= 8): 
+            return None
+        return hh_adj + 12
+        
+    elif periodo == 'de la noche':
+        if hh_orig not in [8, 9, 10, 11, 12, 1, 2, 3, 4]: 
+            return None
+        if 8 <= hh_adj <= 11: 
+            return hh_adj + 12
+        if hh_adj == 12: 
+            return 0
+        if 1 <= hh_adj <= 4: 
+            return hh_adj
+            
+    elif periodo == 'de la madrugada':
+        if not (1 <= hh_orig <= 6): 
+            return None
+        return hh_adj
+        
+    return None
+
+
+def normalizaHoras(ficText, ficNorm):
+    """
+    Lee ficText, busca expresiones horarias válidas, las convierte
+    al formato HH:MM de 24 horas y escribe el resultado en ficNorm.
+    """
+    
+    # -------------------------------------------------------------------------
+    # PATRÓN 1: Formato estándar con dos puntos 
+    # -------------------------------------------------------------------------
+    pat_colon = r'\b(\d{1,2}):(\d{2})(?:\s+(de la mañana|del mediodía|de la tarde|de la noche|de la madrugada))?\b'
+    
+    def repl_colon(m):
+        hh = int(m.group(1))
+        mm = int(m.group(2))
+        periodo = m.group(3)
+        
+        if hh >= 24 or mm >= 60:
+            return m.group(0)  # Incorrecto, no se toca
+            
+        if periodo:
+            if not (1 <= hh <= 12): 
+                return m.group(0)
+            hh_24 = _obtener_desplazamiento_periodo(hh, hh, periodo)
+            if hh_24 == None: 
+                return m.group(0)
+            return f"{hh_24:02d}:{mm:02d}"
+        else:
+            return f"{hh:02d}:{mm:02d}"
+
+    # -------------------------------------------------------------------------
+    # PATRÓN 2: Formato compacto con letras 'h' y 'm'
+    # -------------------------------------------------------------------------
+    pat_hm = r'\b(\d{1,2})h(?:(\d{1,2})m)?(?:\s+(de la mañana|del mediodía|de la tarde|de la noche|de la madrugada))?\b'
+    
+    def repl_hm(m):
+        hh = int(m.group(1))
+        mm = int(m.group(2)) if m.group(2) else 0
+        periodo = m.group(3)
+        
+        if mm >= 60:
+            return m.group(0)
+            
+        if periodo:
+            if not (1 <= hh <= 12): 
+                return m.group(0)
+            hh_24 = _obtener_desplazamiento_periodo(hh, hh, periodo)
+            if hh_24 == None: 
+                return m.group(0)
+            return f"{hh_24:02d}:{mm:02d}"
+        else:
+            if hh >= 24: 
+                return m.group(0)
+            return f"{hh:02d}:{mm:02d}"
+
+    # -------------------------------------------------------------------------
+    # PATRÓN 3: Expresiones verbales completas 
+    # -------------------------------------------------------------------------
+    pat_palabras = (
+        r'\b(\d{1,2})(?:\s+(en punto|y cuarto|y media|menos cuarto))?\s+(de la mañana|del mediodía|de la tarde|de la noche|de la madrugada)\b|'
+        r'\b(\d{1,2})\s+(en punto|y cuarto|y media|menos cuarto)\b'
+    )
+    
+    def repl_palabras(m):
+        if m.group(1) is not None:
+            hh_orig = int(m.group(1))
+            modificador = m.group(2)
+            periodo = m.group(3)
+        else:
+            hh_orig = int(m.group(4))
+            modificador = m.group(5)
+            periodo = None
+            
+        if not (1 <= hh_orig <= 12):
+            return m.group(0)
+            
+        # Calcular los minutos correspondientes y la hora ajustada si resta
+        if modificador == 'en punto' or modificador is None:
+            mm = 0
+            hh_adj = hh_orig
+        elif modificador == 'y cuarto':
+            mm = 15
+            hh_adj = hh_orig
+        elif modificador == 'y media':
+            mm = 30
+            hh_adj = hh_orig
+        elif modificador == 'menos cuarto':
+            mm = 45
+            hh_adj = 12 if hh_orig == 1 else hh_orig - 1
+            
+        if periodo:
+            hh_24 = _obtener_desplazamiento_periodo(hh_orig, hh_adj, periodo)
+            if hh_24 == None: 
+                return m.group(0)
+            return f"{hh_24:02d}:{mm:02d}"
+        else:
+            # Al no tener contexto AM/PM se asume el rango 00:00 a 11:59 obligatoriamente
+            hh_24 = hh_adj % 12
+            return f"{hh_24:02d}:{mm:02d}"
+
+    # Procesado del fichero línea a línea
+    with open(ficText, 'r', encoding='utf-8') as f_in, open(ficNorm, 'w', encoding='utf-8') as f_out:
+        for linea in f_in:
+            linea_mod = re.sub(pat_colon, repl_colon, linea)
+            linea_mod = re.sub(pat_hm, repl_hm, linea_mod)
+            linea_mod = re.sub(pat_palabras, repl_palabras, linea_mod)
+            f_out.write(linea_mod)
+
+```
 
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
