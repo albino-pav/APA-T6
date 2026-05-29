@@ -266,7 +266,7 @@ Inserte a continuación los códigos fuente desarrollados en esta tarea, usando 
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
 
-´´´python 
+```python
      
       import re
       
@@ -354,7 +354,7 @@ vale insertar una imagen o una captura de pantalla, debe hacerse en formato *mar
     if __name__ == "__main__":
         import doctest
         doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
-´´´
+```
 
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
