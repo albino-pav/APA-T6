@@ -42,3 +42,62 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(ficAlum):
+    """
+    Lee el fichero de alumnos y devuelve un diccionario con nombre -> Alumno.
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in sorted(alumnos.keys()):
+    ...     print(alumnos[alumno])
+    171	Blanca Agirrebarrenetse	9.5
+    23	Carles Balcell de Lara	4.9
+    68	David Garcia Fuster	7.0
+    """
+    alumnos = {}
+    
+    with open(ficAlum, 'r', encoding='utf-8') as f:
+        for linea in f:
+            linea = linea.strip()
+            if not linea:
+                continue
+            
+            # Separar por espacios en blanco
+            partes = linea.split()
+            if len(partes) < 2:
+                continue
+            
+            # Primera parte: ID
+            numIden = int(partes[0])
+            
+            # Buscar dónde empiezan las notas (buscamos números)
+            notas = []
+            idx_primer_numero = len(partes)
+            
+            for i in range(1, len(partes)):
+                try:
+                    float(partes[i])
+                    idx_primer_numero = i
+                    break
+                except:
+                    pass
+            
+            # Nombre es todo entre el ID y las notas
+            nombre = ' '.join(partes[1:idx_primer_numero])
+            
+            # Notas son los números al final
+            for i in range(idx_primer_numero, len(partes)):
+                try:
+                    notas.append(float(partes[i]))
+                except:
+                    pass
+            
+            alumno = Alumno(nombre, numIden, notas)
+            alumnos[nombre] = alumno
+    
+    return alumnos
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
