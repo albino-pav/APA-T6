@@ -5,7 +5,7 @@
 > [!Important]
 > Introduzca a continuación su nombre y apellidos:
 >
-> Fulano Mengano Zutano
+> Álvaro Ramo Irurre
 
 ## Aviso Importante
 
@@ -258,11 +258,233 @@ Inserte a continuación una captura de pantalla que muestre el resultado de ejec
 fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
 
+![Resultado tests unitarios](tests.png)
+
 ##### Código desarrollado
 
 Inserte a continuación los códigos fuente desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+```python
+
+class Alumno:
+    """
+    Clase usada para el tratamiento de las notas de los alumnos. Cada uno
+    incluye los atributos siguientes:
+
+    numIden:   Número de identificación. Es un número entero que, en caso
+               de no indicarse, toma el valor por defecto 'numIden=-1'.
+    nombre:    Nombre completo del alumno.
+    notas:     Lista de números reales con las distintas notas de cada alumno.
+    """
+
+    def __init__(self, nombre, numIden=-1, notas=[]):
+        self.numIden = numIden
+        self.nombre = nombre
+        self.notas = [nota for nota in notas]
+
+    def __add__(self, other):
+        """
+        Devuelve un nuevo objeto 'Alumno' con una lista de notas ampliada con
+        el valor pasado como argumento. De este modo, añadir una nota a un
+        Alumno se realiza con la orden 'alumno += nota'.
+        """
+        return Alumno(self.nombre, self.numIden, self.notas + [other])
+
+    def media(self):
+        """
+        Devuelve la nota media del alumno.
+        """
+        return sum(self.notas) / len(self.notas) if self.notas else 0
+
+    def __repr__(self):
+        """
+        Devuelve la representación 'oficial' del alumno. A partir de copia
+        y pega de la cadena obtenida es posible crear un nuevo Alumno idéntico.
+        """
+        return f'Alumno("{self.nombre}", {self.numIden!r}, {self.notas!r})'
+
+    def __str__(self):
+        """
+        Devuelve la representación 'bonita' del alumno. Visualiza en tres
+        columnas separas por tabulador el número de identificación, el nombre
+        completo y la nota media del alumno con un decimal.
+        """
+        return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(ficAlum):
+    """
+    Lee el fichero de alumnos y devuelve un diccionario con nombre -> Alumno.
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in sorted(alumnos.keys()):
+    ...     print(alumnos[alumno])
+    171	Blanca Agirrebarrenetse	9.5
+    23	Carles Balcell de Lara	4.9
+    68	David Garcia Fuster	7.0
+    """
+    alumnos = {}
+    
+    with open(ficAlum, 'r', encoding='utf-8') as f:
+        for linea in f:
+            linea = linea.strip()
+            if not linea:
+                continue
+            
+            # Separar por espacios en blanco
+            partes = linea.split()
+            if len(partes) < 2:
+                continue
+            
+            # Primera parte: ID
+            numIden = int(partes[0])
+            
+            # Buscar dónde empiezan las notas (buscamos números)
+            notas = []
+            idx_primer_numero = len(partes)
+            
+            for i in range(1, len(partes)):
+                try:
+                    float(partes[i])
+                    idx_primer_numero = i
+                    break
+                except:
+                    pass
+            
+            # Nombre es todo entre el ID y las notas
+            nombre = ' '.join(partes[1:idx_primer_numero])
+            
+            # Notas son los números al final
+            for i in range(idx_primer_numero, len(partes)):
+                try:
+                    notas.append(float(partes[i]))
+                except:
+                    pass
+            
+            alumno = Alumno(nombre, numIden, notas)
+            alumnos[nombre] = alumno
+    
+    return alumnos
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
+```
+
+```python
+
+# ==================== horas.py ====================
+import re
+
+def normalizaHoras(ficText, ficNorm):
+    """
+    Lee un texto, busca expresiones horarias y las normaliza a HH:MM.
+    Las incorrectas se dejan como están.
+    """
+    with open(ficText, 'r', encoding='utf-8') as f:
+        lineas = f.readlines()
+    
+    resultado = []
+    for linea in lineas:
+        linea_original = linea.rstrip('\n')
+        linea_nueva = linea_original
+
+        def cambia_hhmm(m):
+            h = int(m.group(1))
+            m2 = int(m.group(2))
+            if 0 <= h <= 23 and 0 <= m2 <= 59:
+                return f"{h:02d}:{m2:02d}"
+            else:
+                return m.group(0)
+        linea_nueva = re.sub(r'(\d{1,2}):(\d{1,2})', cambia_hhmm, linea_nueva)
+
+        def cambia_hhmm_sin_puntos(m):
+            h = int(m.group(1))
+            if m.group(2):
+                mins = int(m.group(2))
+            else:
+                mins = 0
+            if 0 <= h <= 23 and 0 <= mins <= 59:
+                return f"{h:02d}:{mins:02d}"
+            else:
+                return m.group(0)
+        linea_nueva = re.sub(r'(\d{1,2})h\s*(?:(\d{1,2})m?)?', cambia_hhmm_sin_puntos, linea_nueva)
+
+        def cambia_cuarto(m):
+            h = int(m.group(1))
+            tipo = m.group(2)
+            if not (1 <= h <= 12):
+                return m.group(0)
+            if tipo == 'cuarto':
+                return f"{h:02d}:15"
+            elif tipo == 'media':
+                return f"{h:02d}:30"
+            elif tipo == 'menos cuarto':
+                h2 = h - 1 if h > 1 else 12
+                return f"{h2:02d}:45"
+            else:
+                return m.group(0)
+        linea_nueva = re.sub(r'(\d{1,2})\s+y\s+(cuarto|media|menos cuarto)', cambia_cuarto, linea_nueva)
+
+        def cambia_en_punto(m):
+            h = int(m.group(1))
+            if 1 <= h <= 12:
+                return f"{h:02d}:00"
+            else:
+                return m.group(0)
+        linea_nueva = re.sub(r'(\d{1,2})\s+en\s+punto', cambia_en_punto, linea_nueva)
+
+        def cambia_periodo(m):
+            h = int(m.group(1))
+            p = m.group(2)
+            if not (1 <= h <= 12):
+                return m.group(0)
+            if p == 'mediodia':
+                if h == 12:
+                    return "12:00"
+                else:
+                    return m.group(0)
+            elif p == 'mañana':
+                if h == 12:
+                    return m.group(0)
+                return f"{h:02d}:00"
+            elif p == 'tarde':
+                if h == 12:
+                    return m.group(0)
+                if 1 <= h <= 7:
+                    return f"{h+12:02d}:00"
+                else:
+                    return m.group(0)
+            elif p == 'noche':
+                if h == 12:
+                    return "00:00"
+                elif 8 <= h <= 11:
+                    return f"{h+12:02d}:00"
+                else:
+                    return m.group(0)
+            elif p == 'madrugada':
+                if 1 <= h <= 5:
+                    return f"{h:02d}:00"
+                else:
+                    return m.group(0)
+            else:
+                return m.group(0)
+        linea_nueva = re.sub(r'(\d{1,2})\s+de\s+la\s+(mañana|tarde|noche|madrugada|mediodia)', cambia_periodo, linea_nueva)
+
+        resultado.append(linea_nueva)
+
+    with open(ficNorm, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(resultado))
+
+
+if __name__ == "__main__":
+    normalizaHoras('horas.txt', 'horas_normalizado.txt')
+    print("ok")
+
+```
 
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
