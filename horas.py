@@ -1,8 +1,6 @@
 """
 Módulo para la normalización de expresiones horarias en documentos de texto.
-Autor: Fulano Mengano Zutano
-Descripción: Detecta patrones de horas en castellano (estándar, verbales, con períodos)
-             y las unifica al formato estándar de 24 horas (HH:MM).
+Albert Calero Alvarez
 """
 
 import re
