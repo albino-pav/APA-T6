@@ -1,3 +1,17 @@
+"""
+Tarea APA-T6: Expresiones regulares.
+
+Autor: Hug Feijoo Giralt
+
+Este fichero contiene la clase 'Alumno', usada para el tratamiento de las notas
+de los alumnos, y la función 'leeAlumnos()', que construye un diccionario de
+objetos 'Alumno' a partir de un fichero de texto analizado con expresiones
+regulares.
+"""
+
+import re
+
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +56,40 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(ficAlum):
+    """
+    Lee un fichero de texto con los datos de los alumnos y devuelve un
+    diccionario en el que la clave es el nombre de cada alumno y el valor el
+    objeto 'Alumno' correspondiente.
+
+    Cada línea del fichero contiene el número de identificación, el nombre
+    completo y la lista de notas, separados por espacios y/o tabuladores. El
+    análisis de cada línea se realiza mediante expresiones regulares.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
+    """
+    linea = re.compile(r'(\d+)\s+([^\d]+?)\s+([\d.\s]+)')
+    alumnos = {}
+    with open(ficAlum, encoding='utf-8') as fpAlum:
+        for registro in fpAlum:
+            encaje = linea.match(registro)
+            if encaje:
+                numIden = int(encaje.group(1))
+                nombre = encaje.group(2).strip()
+                cifras = re.findall(r'\d+\.?\d*', encaje.group(3))
+                notas = [float(nota) for nota in cifras]
+                alumnos[nombre] = Alumno(nombre, numIden, notas)
+    return alumnos
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
