@@ -103,9 +103,10 @@ def leeAlumnos(ficAlum):
 
 if __name__ == "__main__":
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
+```
 
 ### `horas.py`
+
 ```python
 import re
 
@@ -198,3 +199,4 @@ def normalizaHoras(ficText, ficNorm):
 
 if __name__ == "__main__":
     normalizaHoras('horas.txt', 'horas_normalizadas.txt')
+```
