@@ -104,6 +104,9 @@ def leeAlumnos(ficAlum):
 if __name__ == "__main__":
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
+
+### `horas.py`
+```python
 import re
 
 def procesar_coincidencia(match):
