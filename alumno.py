@@ -1,3 +1,6 @@
+import re
+import doctest
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +45,47 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+def leeAlumnos(ficAlum):
+    """
+    Lee un fichero de texto con los datos de todos los alumnos y devuelve un
+    diccionario en el que la clave es el nombre de cada alumno y su contenido
+    el objeto Alumno correspondiente.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171	Blanca Agirrebarrenetse	9.5
+    23	Carles Balcell de Lara	4.9
+    68	David Garcia Fuster	7.0
+    """
+    
+    # Expresión regular para separar: ID, Nombre, y Notas
+    patron = re.compile(r'^\s*(\d+)\s+([A-Za-zÀ-ÿ\s]+?)\s+([\d\.\s]+)$')
+    diccionario_alumnos = {}
+    
+    with open(ficAlum, 'r', encoding='utf-8') as fichero:
+        for linea in fichero:
+            # Quitamos los saltos de línea al final
+            linea = linea.strip() 
+            if not linea:
+                continue
+                
+            match = patron.match(linea)
+            if match:
+                numIden = int(match.group(1))
+                nombre = match.group(2).strip()
+                
+                # Extraemos las notas, las separamos por espacios y las pasamos a float
+                notas_str = match.group(3).split()
+                notas = [float(nota) for nota in notas_str]
+                
+                # Guardamos el objeto Alumno en el diccionario
+                diccionario_alumnos[nombre] = Alumno(nombre, numIden, notas)
+                
+    return diccionario_alumnos
+
+if __name__ == "__main__":
+    # Esto ejecutará las pruebas unitarias cuando corras el script directamente
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
