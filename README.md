@@ -8,7 +8,9 @@ Pedro Muñoz Álvarez
 
 A continuación se muestra el resultado de ejecutar los tests unitarios con la opción verbosa:
 
-![Captura de los tests unitarios](captura_tests.png)
+![Captura de los tests unitarios 1](Captura%201%20P6%20APA.PNG)
+
+![Captura de los tests unitarios 2](Captura%202%20P6%20APA.PNG)
 
 ## Código desarrollado
 
