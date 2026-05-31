@@ -5,7 +5,7 @@
 > [!Important]
 > Introduzca a continuación su nombre y apellidos:
 >
-> Fulano Mengano Zutano
+> Albert Calero Alvarez
 
 ## Aviso Importante
 
@@ -253,10 +253,12 @@ funcionamiento de su función.
   uso de los estándares marcados por PEP-ocho.
 
 ##### Ejecución de los tests unitarios de `alumno.py`
-
 Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
 fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
+
+![](foto.png)
+
 
 ##### Código desarrollado
 
@@ -264,6 +266,160 @@ Inserte a continuación los códigos fuente desarrollados en esta tarea, usando 
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
 
+El leer Alumnos de alumno.py es:
+def leeAlumnos(ficAlum):
+
+    diccionario_alumnos = {}
+    
+    patron = re.compile(r'^\s*(\d+)\s+(.+?)\s+([\d\s.]+)\s*$')
+    
+    with open(ficAlum, 'r', encoding='utf-8') as fichero:
+        for linea in fichero:
+            linea = linea.strip()
+            if not linea:
+                continue
+                
+            match = patron.match(linea)
+            if match:
+                num_id = int(match.group(1))
+                nombre = match.group(2).strip()
+                notas_str = match.group(3)
+                
+                notas = [float(nota) for nota in notas_str.split()]
+                
+                alumno = Alumno(nombre, numIden=num_id, notas=notas)
+                diccionario_alumnos[nombre] = alumno
+                
+    return diccionario_alumnos
+
+    Y el horas.py es:
+
+import re
+
+def normalizaHoras(ficText, ficNorm):
+
+    patron_hora = re.compile(
+        r'\b(\d{1,2})(?:'
+        r':(\d{1,2})|'
+        r'h(?:(\d{1,2})m)?|'
+        r'\s+(en punto|y cuarto|y media|menos cuarto)'
+        r')?'
+        r'(?:\s+(de la mañana|del mediodía|de la tarde|de la noche|de la madrugada))?\b',
+        re.IGNORECASE
+    )
+
+    def cambiar_formato(match):
+        cadena_completa = match.group(0)
+        h_str = match.group(1)
+        m_dos_puntos = match.group(2)
+        m_formato_h = match.group(3)
+        m_verbal = match.group(4)
+        periodo = match.group(5)
+
+        tiene_letra_h = 'h' in cadena_completa or 'H' in cadena_completa
+
+        if (m_dos_puntos is None and m_formato_h is None and m_verbal is None 
+                and periodo is None and not tiene_letra_h):
+            return cadena_completa
+
+        try:
+            hora_origen = int(h_str)
+        except ValueError:
+            return cadena_completa
+
+        if m_dos_puntos is not None:
+            # No se permiten mezclas con texto de períodos o formatos de letra 'h'
+            if periodo is not None or m_verbal is not None or m_formato_h is not None or tiene_letra_h:
+                return cadena_completa
+            # Los minutos del formato estándar obligatoriamente deben tener 2 dígitos (Requisito "17:5" incorrecto)
+            if len(m_dos_puntos) != 2:
+                return cadena_completa
+            minutos = int(m_dos_puntos)
+            if 0 <= hora_origen <= 23 and 0 <= minutos <= 59:
+                return f"{hora_origen:02d}:{minutos:02d}"
+            return cadena_completa
+
+        if tiene_letra_h and periodo is None and m_verbal is None:
+            minutos = int(m_formato_h) if m_formato_h is not None else 0
+            if 0 <= hora_origen <= 23 and 0 <= minutos <= 59:
+                return f"{hora_origen:02d}:{minutos:02d}"
+            return cadena_completa
+
+        if not (1 <= hora_origen <= 12):
+            return cadena_completa
+
+        # Validar consistencia estricta del período del día según las reglas fijadas
+        if periodo is not None:
+            p = periodo.lower()
+            if p == "de la mañana" and not (4 <= hora_origen <= 12):
+                return cadena_completa
+            elif p == "del mediodía" and not (hora_origen == 12 or 1 <= hora_origen <= 3):
+                return cadena_completa
+            elif p == "de la tarde" and not (3 <= hora_origen <= 8):
+                return cadena_completa
+            elif p == "de la noche" and not (8 <= hora_origen <= 12 or 1 <= hora_origen <= 4):
+                return cadena_completa
+            elif p == "de la madrugada" and not (1 <= hora_origen <= 6):
+                return cadena_completa
+
+        minutos = 0
+        desfase_hora = 0
+
+        if m_formato_h is not None:
+            minutos = int(m_formato_h)
+        elif m_verbal is not None:
+            v = m_verbal.lower()
+            if v == "en punto":
+                minutos = 0
+            elif v == "y cuarto":
+                minutos = 15
+            elif v == "y media":
+                minutos = 30
+            elif v == "menos cuarto":
+                minutos = 45
+                desfase_hora = -1
+
+        if not (0 <= minutos <= 59):
+            return cadena_completa
+
+        # Calcular la base de 24 horas usando la hora original
+        if periodo is not None:
+            p = periodo.lower()
+            if p == "de la mañana":
+                base_24h = 12 if hora_origen == 12 else hora_origen
+            elif p == "del mediodía":
+                base_24h = 12 if hora_origen == 12 else hora_origen + 12
+            elif p == "de la tarde":
+                base_24h = hora_origen + 12
+            elif p == "de la noche":
+                base_24h = 0 if hora_origen == 12 else (hora_origen + 12 if hora_origen >= 8 else hora_origen)
+            elif p == "de la madrugada":
+                base_24h = hora_origen
+        else:
+            # Sin período explícito se asume el rango de 00:00 a 11:59
+            base_24h = 0 if hora_origen == 12 else hora_origen
+
+        # Aplicamos la modificación de hora (por ejemplo, retrasar una hora si es 'menos cuarto')
+        hora_final = base_24h + desfase_hora
+        if hora_final < 0:
+            hora_final = 23
+        elif hora_final >= 24:
+            hora_final = 0
+
+        return f"{hora_final:02d}:{minutos:02d}"
+
+    # Lectura, procesamiento y escritura de ficheros
+    with open(ficText, 'r', encoding='utf-8') as f_entrada, open(ficNorm, 'w', encoding='utf-8') as f_salida:
+        for linea in f_entrada:
+            linea_procesada = patron_hora.sub(cambiar_formato, linea)
+            f_salida.write(linea_procesada)
+
+
+if __name__ == '__main__':
+    normalizaHoras('horas.txt', 'horas_normalizadas.txt')
+    print("Fichero de horas procesado de manera exitosa en 'horas_normalizadas.txt'.")
+
+    
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
 La entrega se formalizará mediante *pull request* al repositorio de la tarea.

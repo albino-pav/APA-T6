@@ -1,3 +1,11 @@
+"""
+Módulo para la gestión y tratamiento de notas de alumnos.
+Albert Calero Alvarez
+"""
+
+import re
+import doctest
+
 class Alumno:
     """
     Clase usada para el tratamiento de las notas de los alumnos. Cada uno
@@ -42,3 +50,45 @@ class Alumno:
         completo y la nota media del alumno con un decimal.
         """
         return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(ficAlum):
+    """
+    Lee un fichero de texto con los datos de todos los alumnos y devuelve un
+    diccionario en el que la clave sea el nombre de cada alumno y su contenido 
+    el objeto Alumno correspondiente.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171 Blanca Agirrebarrenetse 9.5
+    23 Carles Balcells de Lara 4.9
+    68 David Garcia Fuster 7.0
+    """
+    diccionario_alumnos = {}
+    
+    patron = re.compile(r'^\s*(\d+)\s+(.+?)\s+([\d\s.]+)\s*$')
+    
+    with open(ficAlum, 'r', encoding='utf-8') as fichero:
+        for linea in fichero:
+            linea = linea.strip()
+            if not linea:
+                continue
+                
+            match = patron.match(linea)
+            if match:
+                num_id = int(match.group(1))
+                nombre = match.group(2).strip()
+                notas_str = match.group(3)
+                
+                notas = [float(nota) for nota in notas_str.split()]
+                
+                alumno = Alumno(nombre, numIden=num_id, notas=notas)
+                diccionario_alumnos[nombre] = alumno
+                
+    return diccionario_alumnos
+
+
+if __name__ == '__main__':
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
