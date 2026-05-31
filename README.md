@@ -1,6 +1,6 @@
 # Expresiones Regulares
 
-## Nom i cognoms
+## Nombre y Apellidos
 
 Pedro Muñoz Álvarez
 
