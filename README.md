@@ -253,10 +253,12 @@ funcionamiento de su función.
   uso de los estándares marcados por PEP-ocho.
 
 ##### Ejecución de los tests unitarios de `alumno.py`
-![](foto.png)
 Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
 fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
+
+![](foto.png)
+
 
 ##### Código desarrollado
 
