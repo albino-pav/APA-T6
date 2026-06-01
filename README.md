@@ -179,7 +179,7 @@ Las horas con expresión incorrecta deben dejarse tal cual.
 ```python
 """
 Alumno - Tratamiento de notas de alumnos con expresiones regulares.
-Autor: Fulano Mengano Zutano
+Autor: Sandra Cots Agüera
 """
 
 import re
@@ -276,7 +276,7 @@ if __name__ == '__main__':
 ```python
 """
 horas.py - Normalización de expresiones horarias en castellano.
-Autor: Fulano Mengano Zutano
+Autor: Sandra Cots Agüera
 """
 
 import re
