@@ -5,7 +5,7 @@
 > [!Important]
 > Introduzca a continuación su nombre y apellidos:
 >
-> Fulano Mengano Zutano
+> Carolina Villarraga Pérez
 
 ## Aviso Importante
 
@@ -252,17 +252,361 @@ funcionamiento de su función.
 - Se valorará lo pythónico de la solución; en concreto, su claridad y sencillez, y el
   uso de los estándares marcados por PEP-ocho.
 
+
+
 ##### Ejecución de los tests unitarios de `alumno.py`
 
-Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
-fichero `alumno.py` con la opción *verbosa*, de manera que se muestre el
-resultado de la ejecución de los tests unitarios.
+![Ejecución de los tests unitarios](./captura_doctest.png)
 
 ##### Código desarrollado
 
-Inserte a continuación los códigos fuente desarrollados en esta tarea, usando los
-comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
-vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+## Código desarrollado
+
+### Código de `alumno.py`
+
+```python
+"""
+Tratamiento de ficheros de notas de alumnos.
+
+Autora: Carolina Villarraga Pérez
+
+Este módulo contiene la clase Alumno y la función leeAlumnos(), que permite
+leer un fichero de texto con los datos de varios alumnos usando expresiones
+regulares.
+"""
+
+import doctest
+import re
+
+
+class Alumno:
+    """
+    Clase usada para el tratamiento de las notas de los alumnos. Cada uno
+    incluye los atributos siguientes:
+
+    numIden:   Número de identificación. Es un número entero que, en caso
+               de no indicarse, toma el valor por defecto 'numIden=-1'.
+    nombre:    Nombre completo del alumno.
+    notas:     Lista de números reales con las distintas notas de cada alumno.
+    """
+
+    def __init__(self, nombre, numIden=-1, notas=[]):
+        self.numIden = numIden
+        self.nombre = nombre
+        self.notas = [nota for nota in notas]
+
+    def __add__(self, other):
+        """
+        Devuelve un nuevo objeto 'Alumno' con una lista de notas ampliada con
+        el valor pasado como argumento. De este modo, añadir una nota a un
+        Alumno se realiza con la orden 'alumno += nota'.
+        """
+        return Alumno(self.nombre, self.numIden, self.notas + [other])
+
+    def media(self):
+        """
+        Devuelve la nota media del alumno.
+        """
+        return sum(self.notas) / len(self.notas) if self.notas else 0
+
+    def __repr__(self):
+        """
+        Devuelve la representación 'oficial' del alumno. A partir de copia
+        y pega de la cadena obtenida es posible crear un nuevo Alumno idéntico.
+        """
+        return f'Alumno("{self.nombre}", {self.numIden!r}, {self.notas!r})'
+
+    def __str__(self):
+        """
+        Devuelve la representación 'bonita' del alumno. Visualiza en tres
+        columnas separas por tabulador el número de identificación, el nombre
+        completo y la nota media del alumno con un decimal.
+        """
+        return f'{self.numIden}\t{self.nombre}\t{self.media():.1f}'
+
+
+def leeAlumnos(ficAlum):
+    """
+    Lee un fichero de alumnos y devuelve un diccionario.
+
+    La clave del diccionario es el nombre completo del alumno y el valor es
+    el objeto Alumno correspondiente.
+
+    >>> alumnos = leeAlumnos('alumnos.txt')
+    >>> for alumno in alumnos:
+    ...     print(alumnos[alumno])
+    ...
+    171     Blanca Agirrebarrenetse 9.5
+    23      Carles Balcells de Lara 4.9
+    68      David Garcia Fuster     7.0
+    """
+    alumnos = {}
+
+    patron_linea = re.compile(
+        r"^\s*"
+        r"(?P<num_iden>\d+)"
+        r"\s+"
+        r"(?P<nombre>[^\d]+?)"
+        r"\s+"
+        r"(?P<notas>(?:\d+(?:\.\d+)?\s*)+)"
+        r"$"
+    )
+
+    with open(ficAlum, encoding="utf-8") as fichero:
+        for linea in fichero:
+            coincidencia = patron_linea.fullmatch(linea)
+
+            if coincidencia:
+                num_iden = int(coincidencia.group("num_iden"))
+                nombre = " ".join(coincidencia.group("nombre").split())
+                notas_texto = coincidencia.group("notas")
+
+                notas = [
+                    float(nota)
+                    for nota in re.findall(r"\d+(?:\.\d+)?", notas_texto)
+                ]
+
+                alumnos[nombre] = Alumno(nombre, num_iden, notas)
+
+    return alumnos
+
+
+if __name__ == "__main__":
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE, verbose=True)
+```
+
+### Código de `horas.py`
+
+```python
+"""
+Normalización de expresiones horarias.
+
+Autora: Carolina Villarraga Pérez
+
+Este módulo contiene la función normalizaHoras(), que lee un fichero de texto,
+detecta expresiones horarias mediante expresiones regulares y escribe otro
+fichero con dichas horas normalizadas al formato HH:MM.
+"""
+
+import re
+
+
+PERIODO_RE = (
+    r"de\s+la\s+mañana|"
+    r"del\s+mediod[ií]a|"
+    r"de\s+la\s+tarde|"
+    r"de\s+la\s+noche|"
+    r"de\s+la\s+madrugada"
+)
+
+PATRON_PERIODO = re.compile(
+    rf"""
+    (?<!\d)
+    (?P<hora>\d{{1,2}})
+    (?:
+        h(?:(?P<min_h>\d{{1,2}})m)?
+      |
+        \s+(?P<expr>en\s+punto|y\s+cuarto|y\s+media|menos\s+cuarto)
+    )?
+    \s+(?P<periodo>{PERIODO_RE})
+    (?!\w)
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+PATRON_HM = re.compile(
+    rf"""
+    (?<!\d)
+    (?P<hora>\d{{1,2}})h(?:(?P<minuto>\d{{1,2}})m)?
+    (?!\w)
+    (?!\s+(?:{PERIODO_RE}))
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+PATRON_HABLADA = re.compile(
+    r"""
+    (?<!\d)
+    (?P<hora>\d{1,2})
+    \s+(?P<expr>en\s+punto|y\s+cuarto|y\s+media|menos\s+cuarto)
+    (?!\w)
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+PATRON_DOS_PUNTOS = re.compile(
+    r"(?<!\d)(?P<hora>\d{1,2}):(?P<minuto>\d{2})(?!\d)"
+)
+
+
+def _formatea(hora, minuto):
+    return f"{hora:02d}:{minuto:02d}"
+
+
+def _periodo_clave(periodo):
+    periodo = periodo.lower().replace("í", "i")
+    periodo = re.sub(r"\s+", " ", periodo.strip())
+
+    if periodo == "de la mañana":
+        return "manana"
+    if periodo == "del mediodia":
+        return "mediodia"
+    if periodo == "de la tarde":
+        return "tarde"
+    if periodo == "de la noche":
+        return "noche"
+    if periodo == "de la madrugada":
+        return "madrugada"
+
+    return ""
+
+
+def _hora_segun_periodo(hora, periodo):
+    if not 1 <= hora <= 12:
+        return None
+
+    clave = _periodo_clave(periodo)
+
+    if clave == "manana" and 4 <= hora <= 12:
+        return 12 if hora == 12 else hora
+
+    if clave == "mediodia":
+        if hora == 12:
+            return 12
+        if 1 <= hora <= 3:
+            return hora + 12
+
+    if clave == "tarde" and 3 <= hora <= 8:
+        return hora + 12
+
+    if clave == "noche":
+        if hora == 12:
+            return 0
+        if 8 <= hora <= 11:
+            return hora + 12
+        if 1 <= hora <= 4:
+            return hora
+
+    if clave == "madrugada" and 1 <= hora <= 6:
+        return hora
+
+    return None
+
+
+def _aplica_expresion(hora, expresion, periodo=None):
+    if periodo is None:
+        if not 1 <= hora <= 12:
+            return None
+        hora_24 = 0 if hora == 12 else hora
+        modulo = 12
+    else:
+        hora_24 = _hora_segun_periodo(hora, periodo)
+        modulo = 24
+
+        if hora_24 is None:
+            return None
+
+    if expresion is None:
+        minuto = 0
+    else:
+        expresion = re.sub(r"\s+", " ", expresion.lower().strip())
+
+        if expresion == "en punto":
+            minuto = 0
+        elif expresion == "y cuarto":
+            minuto = 15
+        elif expresion == "y media":
+            minuto = 30
+        elif expresion == "menos cuarto":
+            hora_24 = (hora_24 - 1) % modulo
+            minuto = 45
+        else:
+            return None
+
+    return hora_24, minuto
+
+
+def _sustituye_periodo(coincidencia):
+    original = coincidencia.group(0)
+    hora = int(coincidencia.group("hora"))
+    minuto_h = coincidencia.group("min_h")
+    expresion = coincidencia.group("expr")
+    periodo = coincidencia.group("periodo")
+
+    if minuto_h is not None:
+        minuto = int(minuto_h)
+
+        if not 0 <= minuto <= 59:
+            return original
+
+        hora_24 = _hora_segun_periodo(hora, periodo)
+
+        if hora_24 is None:
+            return original
+
+        return _formatea(hora_24, minuto)
+
+    resultado = _aplica_expresion(hora, expresion, periodo)
+
+    if resultado is None:
+        return original
+
+    return _formatea(*resultado)
+
+
+def _sustituye_hm(coincidencia):
+    original = coincidencia.group(0)
+    hora = int(coincidencia.group("hora"))
+    minuto = coincidencia.group("minuto")
+    minuto = 0 if minuto is None else int(minuto)
+
+    if 0 <= hora <= 23 and 0 <= minuto <= 59:
+        return _formatea(hora, minuto)
+
+    return original
+
+
+def _sustituye_hablada(coincidencia):
+    original = coincidencia.group(0)
+    hora = int(coincidencia.group("hora"))
+    expresion = coincidencia.group("expr")
+    resultado = _aplica_expresion(hora, expresion)
+
+    if resultado is None:
+        return original
+
+    return _formatea(*resultado)
+
+
+def _sustituye_dos_puntos(coincidencia):
+    original = coincidencia.group(0)
+    hora = int(coincidencia.group("hora"))
+    minuto = int(coincidencia.group("minuto"))
+
+    if 0 <= hora <= 23 and 0 <= minuto <= 59:
+        return _formatea(hora, minuto)
+
+    return original
+
+
+def _normaliza_linea(linea):
+    linea = PATRON_PERIODO.sub(_sustituye_periodo, linea)
+    linea = PATRON_HM.sub(_sustituye_hm, linea)
+    linea = PATRON_HABLADA.sub(_sustituye_hablada, linea)
+    linea = PATRON_DOS_PUNTOS.sub(_sustituye_dos_puntos, linea)
+
+    return linea
+
+
+def normalizaHoras(ficText, ficNorm):
+    with open(ficText, encoding="utf-8") as entrada:
+        with open(ficNorm, "w", encoding="utf-8") as salida:
+            for linea in entrada:
+                salida.write(_normaliza_linea(linea))
+```
+
+
 
 ##### Subida del resultado al repositorio GitHub y *pull-request*
 
