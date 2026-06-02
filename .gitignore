@@ -1,0 +1,6 @@
+.apa/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+horas_normalizadas.txt
+prueba_horas.py
